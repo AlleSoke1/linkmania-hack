@@ -43,6 +43,8 @@
 #include "resource.h"
 #include "Window.h"
 
+#define _CRT_SECURE_NO_WARNINGS
+
 using  namespace std;
 SOCKET gs_socket;
 int gsConnect = 0;
@@ -239,8 +241,6 @@ void sendpacket(SOCKET s, BYTE* buf, int len, int flags)
 		}
 	}
 
-	freopen("CONIN$", "r", stdin);
-	freopen("CONOUT$", "w", stdout);
 
 	cout << "SEND ->";
 
@@ -312,6 +312,10 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
+
+		freopen("CONIN$", "r", stdin);
+		freopen("CONOUT$", "w", stdout);
+
 		g_Console.InitCore();
 		Mecanik();
 		SetByte((PVOID)0x004D1E69, 0xEB);    // mu cacat
@@ -360,9 +364,6 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 /* Send Packet bitch! :) */
 void recvpacket(SOCKET s, BYTE* buf, int len, int flags)
 {
-	freopen("CONIN$", "r", stdin);
-	freopen("CONOUT$", "w", stdout);
-
 	cout << "FAKE-RECV ->";
 
 	for (int i = 0; i < len; i++){
@@ -405,8 +406,8 @@ void AutoKill()
 // -------------------------------------------------------------------
 int WINAPI mysend(SOCKET s, BYTE* buf, int len, int flags) {
 	
-	unsigned char MecanikXOR[] = { 0x3A, 0x4E, 0x10, 0xCF, 0xAD, 0x5F, 0xD8, 0xC2, 0xDF, 0x20, 0x02, 0xE4, 0xED, 0x46, 0x42, 0xEB, 0x6E, 0x2D, 0x87, 0xF0, 0xCE, 0xA7, 0x53, 0x21, 0xF6, 0xE7, 0xE1, 0x83, 0x1A, 0x88, 0x6F, 0xDF };
 	
+
 	int StartPos = 0;
 	// ----
 	if (gsConnect == 1){
@@ -489,8 +490,7 @@ if (buf[2] == 0x11)
 // -------------------------------------------------------------------
 int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 {
-	freopen("CONIN$", "r", stdin);
-	freopen("CONOUT$", "w", stdout);
+
 	unsigned char XOR[] = { 0x04, 0x08, 0x0f, 0x10, 0x17, 0x2a, 0xff, 0x7b, 0x84, 0xb3 };
 
 	/*if (buf[2] == 0x00 || buf[2] == 0x02) {
@@ -609,8 +609,7 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 				//buf[5] buf[6] == 1
 				if (buf[4] == 1)
 				{
-					freopen("CONIN$", "r", stdin);
-					freopen("CONOUT$", "w", stdout);
+
 					int targetIndex = ((WORD)(buf[5] & 0x7F) << 8) | (BYTE)buf[6];
 					cout << "TARGET INDEX" << targetIndex << endl;
 					for (int i = 0; i < hithackCount; i++)
@@ -631,8 +630,7 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 					BYTE _start = 0;
 					for (int i = 0; i < buf[4]; i++)
 					{
-						freopen("CONIN$", "r", stdin);
-						freopen("CONOUT$", "w", stdout);
+			
 						int targetIndex = ((WORD)(buf[5] & 0x7F) << 8) | (BYTE)buf[6];
 						cout << "TARGET INDEX" << targetIndex << endl;
 						for (int i = 0; i < hithackCount; i++)
