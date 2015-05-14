@@ -239,12 +239,12 @@ DWORD GetByte(const LPVOID dwOffset, BYTE & btValue)
 /* Send Packet bitch! :) */
 void sendpacket(SOCKET s, BYTE* buf, int len, int flags)
 {
-	BYTE Packet[50];
+	/*BYTE Packet[50];
 	for (int i = 0; i < len; i++){
 		if (buf[i] != 0x00) {
 			Packet[i] = buf[i];
 		}
-	}
+	}*/
 
 /*	cout << "SEND ->";
 
@@ -320,9 +320,12 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		freopen("CONIN$", "r", stdin);
 		freopen("CONOUT$", "w", stdout);
 
+		setvbuf(stdout, NULL, _IONBF, 0);
+		setvbuf(stderr, NULL, _IONBF, 0);
+
 		g_Console.InitCore();
 		Mecanik();
-		SetByte((PVOID)0x004D1E69, 0xEB);    // mu cacat
+		SetByte((PVOID)0x004D1E69, 0xEB);    // mu.exe cacat
 		SetByte((PVOID)(0x0095CD6D + 2), 1); //Min level Req to use Helper
 		SetByte((PVOID)(0x0095CD93 + 1), 1); //MuHelper Box error
 
@@ -358,7 +361,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		DetourUpdateThread(GetCurrentThread());
 		CheckAndDetach(&(PVOID&)psend, mysend, "send");
 		CheckAndDetach(&(PVOID&)precv, myrecv, "recv");
-		CheckAndDetach(&(PVOID&)precv, myconnect, "connect");
+		CheckAndDetach(&(PVOID&)precv, myconnect, "connect"); //aici greseala
 		WSACleanup();
 		break;
 	}
@@ -473,7 +476,7 @@ if (autokill == 1)
 	}
 	printf("\n");
 //}
-/**/
+
 	return psend(s, buf, len, flags);
 }
 
@@ -731,7 +734,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
 
 	CreateWindowW(wc.lpszClassName, L"[ LinkMania 哈克 ]",
 		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-		400, 400, 400, 300, 0, 0, hInstance, 0);
+		0, 400, 400, 300, 0, 0, hInstance, 0);
 
 	DialogBox(hInstance, MAKEINTRESOURCE(IDD_FORMVIEW),
 		hDialog, reinterpret_cast<DLGPROC>(DialogProc));
@@ -905,10 +908,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
 
 			g_Console.ConsoleOutput(2, "[TELEPORT] TO x= %d y= %d  ", TELEcoord[0], TELEcoord[1]);
 		}
-		if (LOWORD(wParam) == ID_DEC) {
-
-			freopen("CONIN$", "r", stdin);
-			freopen("CONOUT$", "w", stdout);
+		if (LOWORD(wParam) == ID_BUFF) {
+			BYTE BuffPacket[] = { 0xC1, 0x04, 0xF6 , 0xFD };
+			
+			sendpacket(gs_socket, BuffPacket, sizeof(BuffPacket), 0);
 			g_Console.ConsoleOutput(2, "[BUFFED]");
 		}
 
