@@ -1,7 +1,6 @@
 ﻿// dllmain.cpp : Defines the entry point for the DLL application.
 //#define _CRT_SECURE_NO_WARNINGS
 #include "stdafx.h"
-#include <winsock2.h>
 #include <tlhelp32.h>
 #include "windows.h"
 #include <tchar.h>
@@ -42,10 +41,12 @@
 #pragma comment(lib, "user32.lib")
 #include "resource.h"
 #include "Window.h"
+#include <vector>
+#include "OTOKILL.h"
 
-#define _CRT_SECURE_NO_WARNINGS
 
-using  namespace std;
+using namespace std;
+
 SOCKET gs_socket;
 int gsConnect = 0;
 int autokill = 0;
@@ -53,6 +54,10 @@ int hithackCount = 0;
 int maxhitcount = 50;
 BYTE teleID[2];
 BYTE TELEcoord[2] = { 130, 130 };
+
+//MobList VECTOR
+std::vector<int> mobList;
+
 #define SET_NUMBERH(x) ( (BYTE)((DWORD)(x)>>(DWORD)8) )
 #define SET_NUMBERL(x) ( (BYTE)((DWORD)(x) & 0xFF) )
 #define MAKE_NUMBERW(x,y)  ( (WORD)(((BYTE)((y)&0xFF)) |   ((BYTE)((x)&0xFF)<<8 ))  )
@@ -157,7 +162,7 @@ extern  "C"  __declspec(dllexport) void __cdecl Mecanik()
 	g_Console.ConsoleOutput(2, "/clear  (clear console)");
 	g_Console.ConsoleOutput(2, "/dump   (show traffic)");
 }
-/* THREAD TEST */
+/* THREAD WINDOW */
 unsigned int __stdcall threadTEST(void* data)
 {
 
@@ -241,14 +246,13 @@ void sendpacket(SOCKET s, BYTE* buf, int len, int flags)
 		}
 	}
 
-
-	cout << "SEND ->";
+/*	cout << "SEND ->";
 
 	for (int i = 0; i < len; i++){
 		printf(" %.2X ", Packet[i]);
 	}
 	printf("\n");
-	//g_Console.ConsoleOutput(1, "Packet sent: 0x%02X", (BYTE)Packet);
+	*///g_Console.ConsoleOutput(1, "Packet sent: 0x%02X", (BYTE)Packet);
 
 	psend(s, buf, len, flags);
 }
@@ -322,11 +326,11 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		SetByte((PVOID)(0x0095CD6D + 2), 1); //Min level Req to use Helper
 		SetByte((PVOID)(0x0095CD93 + 1), 1); //MuHelper Box error
 
-		addr = GetAddress(0x6C852B78, "zClient.dll");
-		SetByte((PVOID)(addr), 'H');
-		SetByte((PVOID)(addr + 1), 'a');
-		SetByte((PVOID)(addr + 2), 'c');
-		SetByte((PVOID)(addr + 3), 'k');
+    //	addr = GetAddress(0x6C852B78, "zClient.dll");
+	//	SetByte((PVOID)(addr), 'H');
+	//	SetByte((PVOID)(addr + 1), 'a');
+	//  SetByte((PVOID)(addr + 2), 'c');
+	//	SetByte((PVOID)(addr + 3), 'k');
 
 		//Window Vechi
 		HANDLE hthreadTEST, hEvent;
@@ -361,7 +365,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	return TRUE;
 }
 
-/* Send Packet bitch! :) */
+/* fake recv Packet bitch! :) */
 void recvpacket(SOCKET s, BYTE* buf, int len, int flags)
 {
 	cout << "FAKE-RECV ->";
@@ -373,7 +377,7 @@ void recvpacket(SOCKET s, BYTE* buf, int len, int flags)
 
 	precv(s, buf, len, flags);
 }
-/* */
+/*
 void CheckMouseButtonStatus()
 {
 	//Check the mouse left button is pressed or not
@@ -386,28 +390,14 @@ void CheckMouseButtonStatus()
 	{
 	//	MessageBox(NULL, "RButton pressed", "LButton pressed", MB_OK);
 	}
-}
+} */
 
-void AutoKill()
-{
-	while (true)
-	{
-		unsigned char buf1[] = { 0xC1, 0x07, 0x11, 0x23, 0x93, 0x33, 0x69 }; //  ? 69// hit ar trebuii sa fie ?
-		//0xC2 0x00 0x0F 0x13 0x01 0x88 0x70 0x00 0x03
-		srand(time(NULL));
-		buf1[6] = rand() % 255;
-		sendpacket(gs_socket, buf1, sizeof(buf1), 0);
-		Sleep(100);
-	}
-}
 
 
 
 // -------------------------------------------------------------------
 int WINAPI mysend(SOCKET s, BYTE* buf, int len, int flags) {
 	
-	
-
 	int StartPos = 0;
 	// ----
 	if (gsConnect == 1){
@@ -474,15 +464,15 @@ if (autokill == 1)
 }
 
 
-if (buf[2] == 0x11)
-{
+//if (buf[2] == 0x11)
+//{
 	printf("SEND ->");
 	for (int i = 0; i < buf[1]; i++)
 	{
 		printf("%.2X ", buf[i]);
 	}
 	printf("\n");
-}
+//}
 /**/
 	return psend(s, buf, len, flags);
 }
@@ -491,7 +481,7 @@ if (buf[2] == 0x11)
 int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 {
 
-	unsigned char XOR[] = { 0x04, 0x08, 0x0f, 0x10, 0x17, 0x2a, 0xff, 0x7b, 0x84, 0xb3 };
+	//unsigned char XOR[] = { 0x04, 0x08, 0x0f, 0x10, 0x17, 0x2a, 0xff, 0x7b, 0x84, 0xb3 };
 
 	/*if (buf[2] == 0x00 || buf[2] == 0x02) {
 		for (int i = 3; i < buf[1]; i++) {
@@ -499,8 +489,8 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 		}
 	}*/
 
-	BYTE LiNU[10];
-	BYTE LiNU2[100];
+//	BYTE LiNU[10];
+//	BYTE LiNU2[100];
 
 	/*if (buf[0x00] == (BYTE)0xc1) {
 		if (buf[0x02] == (BYTE)0x02) {
@@ -651,7 +641,8 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 				}
 			}
 		}
-	}/**/
+	}
+
 	//cout << "[recv]: 0x%02hX / 0x%02hX / 0x%02hX / 0x%02hX / 0x%02hX / 0x%02hX " << (unsigned char)buf[0] << (unsigned char)buf[1] << (unsigned char)buf[2] << (unsigned char)buf[3] << (unsigned char)buf[4] << (unsigned char)buf[5] << endl;
 
 	/*	FILE *fileAS1;
@@ -664,7 +655,7 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 		fprintf(fileAS1, "][Len: %d][Socket: %d]", len, s);
 		fprintf(fileAS1, "\n");
 		fclose(fileAS1);
-		*/
+	*/
 	if (buf[0] == 0xC1)
 	{
 		if (buf[2] == 0xD4)
@@ -673,9 +664,9 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 			teleID[1] = buf[4];
 		}
 	}
-	/**/
 
-	if (buf[0] == 0xC2 && buf[3] == 0x13)
+
+	if (buf[0] == 0xC2 && buf[3] == 0x13) //mob sent
 	{
 		printf("RECV ->");
 		for (int i = 0; i < buf[1] * 256 + buf[2]; i++)
@@ -705,13 +696,14 @@ int WINAPI myconnect(SOCKET s, const struct sockaddr *name, int namelen) {
 		gs_socket = s; // salvam socketul
 		gsConnect = 1;
 	}
+	else{
+		gsConnect = 0; //fix for server switch
+	}
 
 	return dconnect(s, name, namelen);
 }
 
 //need to be moved
-
-
 
 #define ID_AUTOKILL 1
 #define ID_AUTOKILLOFF 2
@@ -720,6 +712,7 @@ int WINAPI myconnect(SOCKET s, const struct sockaddr *name, int namelen) {
 #define ID_TELETESTX 5
 #define ID_TELETESTY 6
 #define ID_DEC 7
+#define ID_BUFF 8
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nCmdShow) {
 
@@ -735,14 +728,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
 	wc.hCursor = LoadCursor(0, IDC_ARROW);
 
 	RegisterClassW(&wc);
+
 	CreateWindowW(wc.lpszClassName, L"[ LinkMania 哈克 ]",
 		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-		200, 200, 300, 200, 0, 0, hInstance, 0);
+		400, 400, 400, 300, 0, 0, hInstance, 0);
 
-	hDialog = CreateDialog(hInstance,
-		MAKEINTRESOURCE(IDD_FORMVIEW),
-		0,
-		DialogProc);
+	DialogBox(hInstance, MAKEINTRESOURCE(IDD_FORMVIEW),
+		hDialog, reinterpret_cast<DLGPROC>(DialogProc));
 
 	while (GetMessage(&msg, NULL, 0, 0)) {
 		TranslateMessage(&msg);
@@ -829,9 +821,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
 			60, 110, 80, 25,
 			hwnd, (HMENU)ID_TELETEST, NULL, NULL);
 		
-		CreateWindowW(L"button", L"DECRYPT",
+		CreateWindowW(L"button", L"BUFF PLS",
 			WS_VISIBLE | WS_CHILD,
 			60, 150, 80, 25,
+			hwnd, (HMENU)ID_BUFF, NULL, NULL);
+
+		CreateWindowW(L"button", L"DECRYPT",
+			WS_VISIBLE | WS_CHILD,
+			60, 180, 80, 25,
 			hwnd, (HMENU)ID_DEC, NULL, NULL);
 		break;
 
@@ -906,8 +903,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
 		//	sendpacket(gs_socket, CTS, sizeof(CTS), 0);
 			recvpacket(gs_socket, STC, sizeof(STC), 0);
 
-			g_Console.ConsoleOutput(2, "[TELEPORT]  %d %d  ", TELEcoord[0], TELEcoord[1]);
+			g_Console.ConsoleOutput(2, "[TELEPORT] TO x= %d y= %d  ", TELEcoord[0], TELEcoord[1]);
 		}
+		if (LOWORD(wParam) == ID_DEC) {
+
+			freopen("CONIN$", "r", stdin);
+			freopen("CONOUT$", "w", stdout);
+			g_Console.ConsoleOutput(2, "[BUFFED]");
+		}
+
 
 		if (LOWORD(wParam) == ID_DEC) {
 			freopen("CONIN$", "r", stdin);

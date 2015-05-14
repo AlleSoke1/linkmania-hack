@@ -17,3 +17,8 @@
 #include <gl\GL.h>
 #include <Math.h>
 
+#include <winsock2.h>
+//GLOBALS
+void SendMagicPacket(LPBYTE Data, int Size);
+void sendpacket(SOCKET s, BYTE* buf, int len, int flags);
+void recvpacket(SOCKET s, BYTE* buf, int len, int flags);
