@@ -403,6 +403,9 @@ int WINAPI mysend(SOCKET s, BYTE* buf, int len, int flags) {
 	
 	int StartPos = 0;
 	// ----
+	BYTE cheimagice[] = { 0xCF, 0x10, 0x4E, 0x3A, 0xC2, 0xD8, 0x5F, 0xAD, 0xE4, 0x02, 0x20, 0xDF, 0xEB, 0x42, 0x46, 0xED, 0xF0, 0x87, 0x2D, 0x6E, 0x21, 0x53, 0xA7, 0xCE, 0x83, 0xE1, 0xE7, 0xF6, 0xDF, 0x6F, 0x88, 0x1A };
+
+
 	if (gsConnect == 1){
 		/*
 		if (buf[0] == 0xC1 || buf[0] == 0xC3)
@@ -467,15 +470,63 @@ if (autokill == 1)
 }
 
 
-//if (buf[2] == 0x11)
-//{
+
+
+/**/
+BYTE * buf1 = new BYTE[buf[1]];
+buf1 = buf;
+
+
+//memcpy(buf1, buf, sizeof(buf[1]));
+
+if (buf1[0] == (BYTE)0XC1){
+
+		if (buf1[2] == (BYTE)0xFB){
+			
+			for (int i = buf1[1] - 1; i != 2; i += -1)
+			{
+				buf1[i] ^= buf1[i - 1] ^ cheimagice[i % 32];
+			}
+
+			if (buf1[3] == (BYTE)0x07){
+
+				int index = MAKE_NUMBERW(buf[5], buf[4]); 
+				if (index < 8000)
+				{
+					printf("\n %.2X %.2X %.2X %.2X INDEX = %d\n", buf[4], buf[5], buf[6], buf[7], MAKE_NUMBERW(buf[5], buf[4]));
+					if (autokill == 1)
+					{
+						for (int i = 0; i < hithackCount; i++)
+						{
+							//unsigned char bufDC[] = { 0xC1, 0x07, 0x18, buf[5], buf[4], 0x84, 0xBD }; //  ? 69// hit ar trebuii sa fie ?
+							//printf("SENT DC PAK\n");
+							//SendMagicPacket(bufDC, bufDC[1]);
+						
+							unsigned char buf1X[] = { 0xC1, 0x07, 0x11, 0xFF, 0xFF, 0x78, 0x05 }; //  ? 69// hit ar trebuii sa fie ?
+							//  ^      ^
+							//( (WORD)(((BYTE)((y)&0xFF)) |   ((BYTE)((x)&0xFF)<<8 ))  )
+					
+							buf1X[3] = buf[5];
+							buf1X[4] = buf[4];
+
+							SendMagicPacket(buf1X, sizeof(buf1X));
+						}
+					}
+				}
+				g_Console.ConsoleOutput(1, "[HP BAR] REQUEST BAR!!");
+			}
+		}
+}
+
+if (buf[2] == 0xFB)
+{
 	printf("SEND ->");
 	for (int i = 0; i < buf[1]; i++)
 	{
 		printf("%.2X ", buf[i]);
 	}
 	printf("\n");
-//}
+}
 
 	return psend(s, buf, len, flags);
 }
@@ -592,7 +643,7 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 		}
 	} */
 	
-	if (autokill == 1)
+	if (autokill == 2) // enable soon
 	{
 		if (buf[0] == (BYTE)0xC2)
 		{
