@@ -603,7 +603,7 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 				if (buf[4] == 1)
 				{
 
-					int targetIndex = ((WORD)(buf[5] & 0x7F) << 8) | (BYTE)buf[6];
+					int targetIndex = MAKE_NUMBERW(buf[5], buf[6]);
 					cout << "TARGET INDEX" << targetIndex << endl;
 					for (int i = 0; i < hithackCount; i++)
 					{
@@ -624,22 +624,23 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 					for (int i = 0; i < buf[4]; i++)
 					{
 			
-						int targetIndex = ((WORD)(buf[5] & 0x7F) << 8) | (BYTE)buf[6];
+						int targetIndex = MAKE_NUMBERW(buf[5+_start], buf[6+_start]);
 						cout << "TARGET INDEX" << targetIndex << endl;
 						for (int i = 0; i < hithackCount; i++)
 						{
 							unsigned char buf1[] = { 0xC1, 0x07, 0x11, 0xFF, 0xFF, 0x78, 0x05 }; //  ? 69// hit ar trebuii sa fie ?
-							//  ^      ^
+																	//  ^      ^
 							
 							//( (WORD)(((BYTE)((y)&0xFF)) |   ((BYTE)((x)&0xFF)<<8 ))  )
 							int targetIndex = MAKE_NUMBERW(buf[5 + _start], buf[6 + _start]);
 							buf1[3] = (BYTE)((targetIndex >> 8) & 0x00FF);
 							buf1[4] = (BYTE)(targetIndex & 0x00FF);
 
-
+							Sleep(10); 
 							SendMagicPacket(buf1, sizeof(buf1));
-							_start += 10;
+							
 						}
+						_start += 10;
 					}
 				}
 			}
