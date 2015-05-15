@@ -107,7 +107,7 @@ CSplash::CSplash()
 	Init();
 }
 
-CSplash::CSplash(HINSTANCE hInst,int resourceID, COLORREF colTrans) //addon alin1337
+CSplash::CSplash(int resourceID, COLORREF colTrans) //addon alin1337
 {
 	Init();
 

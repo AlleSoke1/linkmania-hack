@@ -27,7 +27,7 @@ public:
 	//  Arg    Path of the Bitmap that will be show on the splash screen
 	//  Arg    The color on the bitmap that will be made transparent
 	//  =======================================================================
-	CSplash(HINSTANCE hInst, int resourceID, COLORREF colTrans);
+	CSplash(int resourceID, COLORREF colTrans);
 
 	//  =======================================================================
 	//  Func   ~CSplash
