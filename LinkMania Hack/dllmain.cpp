@@ -47,7 +47,6 @@
 
 using namespace std;
 
-SPLASH rlktSplash;
 
 SOCKET gs_socket;
 int gsConnect = 0;
@@ -306,9 +305,10 @@ DWORD GetAddress(DWORD addie, LPCSTR module)
 
 }
 BYTE addr = 0; 
-
+HMODULE globalhMod;
+CSplash splash1(globalhMod, IDB_BITMAP1, RGB(128, 128, 128));;
 //extern "C" { int _afxForceUSRDLL; }
-
+///CSplash splash1;
 /* DLL Entry Point */
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -319,11 +319,17 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	{
 	case DLL_PROCESS_ATTACH:
 		//SPLASH SCREEN ^_^
-		
-		rlktSplash.Init(0, 0, IDB_BITMAP1);
-		rlktSplash.Show();
+		globalhMod = hModule;
+
+		splash1.ShowSplash();
 		Sleep(5000);
-		rlktSplash.Hide();
+		splash1.CloseSplash();
+
+		//Window Vechi
+		HANDLE hthreadTEST, hEvent;
+		hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+		hthreadTEST = (HANDLE)_beginthreadex(0, 0, &threadTEST, 0, 0, 0);
+
 
 
 		//everything else.
@@ -345,10 +351,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	//  SetByte((PVOID)(addr + 2), 'c');
 	//	SetByte((PVOID)(addr + 3), 'k');
 
-		//Window Vechi
-		HANDLE hthreadTEST, hEvent;
-		hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-		hthreadTEST = (HANDLE)_beginthreadex(0, 0, &threadTEST, 0, 0, 0);
+		
 		//Window nou
 			
 		//threadTEST = (HANDLE)_beginthreadex(NULL, 0, threadTEST, 0, 0, 0);
@@ -785,6 +788,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLin
 	WNDCLASSW wc = { 0 };
 
 	HWND hDialog = 0;
+
+
 
 	wc.lpszClassName = L"otokill";
 	wc.hInstance = hInstance;
