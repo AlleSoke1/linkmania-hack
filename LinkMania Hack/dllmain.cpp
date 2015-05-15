@@ -1,51 +1,20 @@
 ﻿// dllmain.cpp : Defines the entry point for the DLL application.
 //#define _CRT_SECURE_NO_WARNINGS
 #include "stdafx.h"
-#include <tlhelp32.h>
-#include "windows.h"
-#include <tchar.h>
-#include <time.h>
-#include "detours.h"
-#include <rpc.h>
-#include <rpcdce.h>
-#include <string.h>
-#include <tchar.h>
-#include <stdio.h>
-#include <psapi.h>
-#include <iostream>
-#include <stdio.h>
-#include <string.h>
-#include <fstream>
-#include <assert.h>
-#include <Csignal>
-#include <Sys/types.h>
-#include <Sys/stat.h>
-#include <Aclapi.h>
-#include <Sddl.h>
-#include <process.h>
-#include <shlwapi.h>
-#include <commctrl.h>
-#include <string>
-#include <sstream>
-#include "g_Console.h"
-#include <stdio.h>
 #include "Defines.h"
-#pragma comment(lib, "opengl32.lib")
-#pragma comment(lib, "ws2_32.lib")
-#pragma comment(lib, "wsock32.lib")
-#pragma comment(lib, "detours.lib")
-#pragma comment(lib, "Psapi.lib")
-#pragma comment(lib, "wldap32.lib") 
-#pragma comment(lib, "ws2_32.lib") 
-#pragma comment(lib, "winmm.lib") 
-#pragma comment(lib, "user32.lib")
-#include "resource.h"
-#include <vector>
-#include "OTOKILL.h"
-#include "splash.h"
-#include "Security.h"
-#include "HitHack.h"
 
+
+SOCKET gs_socket;
+int gsConnect = 0;
+int autokill = 0;
+int maxhitcount = MaxHITCount;
+BYTE teleID[2];
+BYTE TELEcoord[2] = { 130, 130 };
+int hithackCount = 0;
+BYTE addr = 0;
+
+//Classes init :)
+CHitHack HitHack;
 
 /* send */
 int (WINAPI *psend)(SOCKET socket, BYTE* buffer, int length, int flags) = NULL;
@@ -56,23 +25,20 @@ int WINAPI myrecv(SOCKET s, BYTE* buf, int len, int flags);
 /* connect */
 int (WINAPI *dconnect)(SOCKET, const struct sockaddr*, int) = NULL;
 int WINAPI myconnect(SOCKET s, const struct sockaddr *name, int namelen);
-/* Definitii hook-uri */
 
 
 
-// -------------------------------------------------------------------
-//WTF???
+
+
 extern  "C"  __declspec(dllexport) void __cdecl Mecanik()
 {
-	
-//	MainForm Init;
-//	Init.DoModal();
 	Security.Init();
 	g_Console.ConsoleOutput(2, "[OK] Am pornit ! Comenzi Disponibile:");
 	g_Console.ConsoleOutput(2, "/exit   (close game)");
 	g_Console.ConsoleOutput(2, "/clear  (clear console)");
 	g_Console.ConsoleOutput(2, "/dump   (show traffic)");
 }
+
 /* THREAD WINDOW */
 unsigned int __stdcall threadTEST(void* data)
 {
@@ -83,45 +49,8 @@ unsigned int __stdcall threadTEST(void* data)
 }
 
 
-/* Send Magic Packet :D */
-void SendMagicPacket(LPBYTE Data, int Size)
-{
-	BYTE cheimagice[] = { 0xCF, 0x10, 0x4E, 0x3A, 0xC2, 0xD8, 0x5F, 0xAD, 0xE4, 0x02, 0x20, 0xDF, 0xEB, 0x42, 0x46, 0xED, 0xF0, 0x87, 0x2D, 0x6E, 0x21, 0x53, 0xA7, 0xCE, 0x83, 0xE1, 0xE7, 0xF6, 0xDF, 0x6F, 0x88, 0x1A };
-	int StartPos = 0;
-	// ----
-	if (Data[0] == 0xC1 || Data[0] == 0xC3)
-	{
-		StartPos = 3;
-	}
-	else if (Data[0] == 0xC2 || Data[0] == 0xC4)
-	{
-		StartPos = 4;
-	}
-	// ----
-	for (int i = StartPos; i < Size; i++)
-	{
-		Data[i] ^= Data[i - 1] ^ cheimagice[i % 32];
-	}
-	// ----
-
-	sendpacket(gs_socket, Data, Size, 0);
-}
-
-void SplashScreen()
-{
-	CSplash splash1(IDB_BITMAP1, RGB(255, 255, 255));
-	splash1.ShowSplash();
-	Sleep(5000);
-	splash1.CloseSplash();
-}
-
-//extern "C" { int _afxForceUSRDLL; }
-///CSplash splash1;
 /* DLL Entry Point */
-BOOL APIENTRY DllMain( HMODULE hModule,
-                       DWORD  ul_reason_for_call,
-                       LPVOID lpReserved
-					 )
+BOOL APIENTRY DllMain( HMODULE hModule,DWORD  ul_reason_for_call,PVOID lpReserved)
 {
 	switch (ul_reason_for_call)
 	{
@@ -149,16 +78,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		SetByte((PVOID)(0x0095CD6D + 2), 1); //Min level Req to use Helper
 		SetByte((PVOID)(0x0095CD93 + 1), 1); //MuHelper Box error
 
-    //	addr = GetAddress(0x6C852B78, "zClient.dll");
-	//	SetByte((PVOID)(addr), 'H');
-	//	SetByte((PVOID)(addr + 1), 'a');
-	//  SetByte((PVOID)(addr + 2), 'c');
-	//	SetByte((PVOID)(addr + 3), 'k');
 
-		
-		//Window nou
-			
-		//threadTEST = (HANDLE)_beginthreadex(NULL, 0, threadTEST, 0, 0, 0);
 		/////////////////////////////////////////////////////
 		DisableThreadLibraryCalls(hModule);
 		DetourRestoreAfterWith();    //Start finding function pointers
@@ -185,58 +105,25 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	return TRUE;
 }
 
-/* fake recv Packet bitch! :) */
-void recvpacket(SOCKET s, BYTE* buf, int len, int flags)
-{
-	cout << "FAKE-RECV ->";
 
-	for (int i = 0; i < len; i++){
-		printf(" %.2X ", buf[i]);
-	}
-	printf("\n");
 
-	precv(s, buf, len, flags);
-}
-
-// -------------------------------------------------------------------
 int WINAPI mysend(SOCKET s, BYTE* buf, int len, int flags) {
 	
 	int StartPos = 0;
 	// ----
 	BYTE cheimagice[] = { 0xCF, 0x10, 0x4E, 0x3A, 0xC2, 0xD8, 0x5F, 0xAD, 0xE4, 0x02, 0x20, 0xDF, 0xEB, 0x42, 0x46, 0xED, 0xF0, 0x87, 0x2D, 0x6E, 0x21, 0x53, 0xA7, 0xCE, 0x83, 0xE1, 0xE7, 0xF6, 0xDF, 0x6F, 0x88, 0x1A };
 
-
-	if (gsConnect == 1){
-	
-		//Check the mouse left button is pressed or not
-		if (g_Console.bReturn == 1)
-		{
-			
-			if ((GetKeyState(VK_SPACE) & 0x80) != 0)
-			{
-		////		g_Console.ConsoleOutput(1, "[Kill] ON!");
-		///		CreateThread(0, 0, LPTHREAD_START_ROUTINE(AutoKill), 0, 0, 0);
-				
-			}
-		}
+	if (autokill == 1)
+	{
+		HitHack.DoMobHit(gs_socket, buf, hithackCount);
 	}
 
-if (autokill == 1)
-{
-	HitHack.DoMobHit(gs_socket, buf, hithackCount);
-}
+
+	BYTE * buf1 = new BYTE[buf[1]];
+	buf1 = buf;
 
 
-
-
-/**/
-BYTE * buf1 = new BYTE[buf[1]];
-buf1 = buf;
-
-
-//memcpy(buf1, buf, sizeof(buf[1]));
-
-if (buf1[0] == (BYTE)0XC1){
+	if (buf1[0] == (BYTE)0XC1){
 
 		if (buf1[2] == (BYTE)0xFB){
 			
@@ -273,22 +160,21 @@ if (buf1[0] == (BYTE)0XC1){
 				g_Console.ConsoleOutput(1, "[HP BAR] REQUEST BAR!!");
 			}
 		}
-}
-
-if (buf[2] == 0xFB)
-{
-	printf("SEND ->");
-	for (int i = 0; i < buf[1]; i++)
-	{
-		printf("%.2X ", buf[i]);
 	}
-	printf("\n");
-}
+
+	if (buf[2] == 0xFB)
+	{
+		printf("SEND ->");
+		for (int i = 0; i < buf[1]; i++)
+		{
+			printf("%.2X ", buf[i]);
+		}
+		printf("\n");
+	}
 
 	return psend(s, buf, len, flags);
 }
 
-// -------------------------------------------------------------------
 int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 {
 
@@ -493,7 +379,6 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 	return precv(s, buf, len, flags);
 }
 
-// -------------------------------------------------------------------
 int WINAPI myconnect(SOCKET s, const struct sockaddr *name, int namelen) {
 
 	SOCKADDR_IN* name_in = (SOCKADDR_IN*)name;
@@ -514,4 +399,3 @@ int WINAPI myconnect(SOCKET s, const struct sockaddr *name, int namelen) {
 
 	return dconnect(s, name, namelen);
 }
-

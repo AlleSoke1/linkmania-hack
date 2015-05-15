@@ -7,10 +7,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LinkMania Hack", "LinkMania
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		ALIN1337|Win32 = ALIN1337|Win32
 		Debug|Win32 = Debug|Win32
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CB2848B6-AD0C-4E95-98AD-5DE9A660F440}.ALIN1337|Win32.ActiveCfg = ALIN1337|Win32
+		{CB2848B6-AD0C-4E95-98AD-5DE9A660F440}.ALIN1337|Win32.Build.0 = ALIN1337|Win32
 		{CB2848B6-AD0C-4E95-98AD-5DE9A660F440}.Debug|Win32.ActiveCfg = Debug|Win32
 		{CB2848B6-AD0C-4E95-98AD-5DE9A660F440}.Debug|Win32.Build.0 = Debug|Win32
 		{CB2848B6-AD0C-4E95-98AD-5DE9A660F440}.Release|Win32.ActiveCfg = Release|Win32

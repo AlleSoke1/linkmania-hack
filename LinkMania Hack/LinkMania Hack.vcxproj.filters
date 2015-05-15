@@ -60,9 +60,6 @@
     <ClInclude Include="Security.h">
       <Filter>Security</Filter>
     </ClInclude>
-    <ClInclude Include="OTOKILL.h">
-      <Filter>AutoKill</Filter>
-    </ClInclude>
     <ClInclude Include="HitHack.h">
       <Filter>HitHack</Filter>
     </ClInclude>
@@ -89,11 +86,20 @@
     <ClCompile Include="Security.cpp">
       <Filter>Security</Filter>
     </ClCompile>
-    <ClCompile Include="OTOKILL.cpp">
-      <Filter>AutoKill</Filter>
-    </ClCompile>
     <ClCompile Include="HitHack.cpp">
       <Filter>HitHack</Filter>
+    </ClCompile>
+    <ClCompile Include="Functions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Detours.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

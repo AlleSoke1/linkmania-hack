@@ -35,7 +35,7 @@ bool CSecurity::Init()
 	else
 	{
 		g_Console.ConsoleOutput(1, "[ ---MAC--- ] License Error!");
-		MessageBoxA(NULL,"You don't have license to use these files!", "You are GAY!",MB_OK);
+		MessageBoxA(NULL,"You don't have an active license to use these files!", "Error!",MB_OK);
 		::ExitProcess(0);
 	}
 	return false;
@@ -44,7 +44,7 @@ bool CSecurity::Init()
 bool CSecurity::Checking(LPCSTR MacID)
 {
 	char ClientsMacs[MacCount][18] =
-	{//
+	{
 		
 		"D0-50-99-1A-B7-64",  // Alinu   :d
 		"00-0C-29-B5-C8-FA",  // Alinu2  :d

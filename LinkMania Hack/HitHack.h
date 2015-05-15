@@ -8,7 +8,7 @@
 #ifndef __HITHACK_H__
 #define __HITHACK_H__
 #include <minwindef.h>
-#define MacCount 30
+#define MaxHITCount 30
 
 
 class CHitHack
