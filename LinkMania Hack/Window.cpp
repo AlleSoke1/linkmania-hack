@@ -1,5 +1,277 @@
 ﻿#include "Defines.h"
 
+#include <windows.h>  //include all the basics
+#include <windowsx.h>
+#include <tchar.h>    //string and other mapping macros
+#include <string.h>
+#include <string>
+#include <vector>
+#include "resource.h"
+
+
+
+//MOVE !!
+void AddLog(const HWND &hwnd, char * Mesaj, ...);
+void AddChatLog(const HWND &hwnd, char * Mesaj, ...);
+char *GetChatType(int index);
+
+//globalVals 
+int ChatType = 0;
+
+
+//define an unicode string type alias
+typedef std::basic_string<TCHAR> ustring;
+//=============================================================================
+//message processing function declarations
+INT_PTR CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+void OnCommand(const HWND, int, int, const HWND);
+INT_PTR OnInitDlg(const HWND, LPARAM);
+
+//non-message function declarations
+inline int ErrMsg(const ustring&);
+//=============================================================================
+int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int)
+{
+	INT_PTR success = DialogBox(hInst, MAKEINTRESOURCE(IDD_DIALOG1), 0, DlgProc);
+
+	if (success == -1)
+	{
+		ErrMsg(_T("DialogBox failed."));
+	}
+	return 0;
+}
+//=============================================================================
+INT_PTR CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_COMMAND:
+	{
+					   OnCommand(hwnd, LOWORD(wParam), HIWORD(wParam),
+						   reinterpret_cast<HWND>(lParam));
+					   return 0;
+	}
+	case WM_INITDIALOG:
+	{
+						  //Add items to chat list 
+						  HWND comboBox = GetDlgItem(hwnd, IDC_COMBOAA);;
+						  SendMessage(comboBox, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(_T("Normal")));
+						  SendMessage(comboBox, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(_T("Guild")));
+						  SendMessage(comboBox, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(_T("Alliance")));
+						  SendMessage(comboBox, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(_T("Gens")));
+						  SendMessage(comboBox, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(_T("ALL!!")));
+
+						  //Init dialog :)
+						  return OnInitDlg(hwnd, lParam);
+	}
+	default:
+		return FALSE;  //let system deal with msg
+	}
+}
+//=============================================================================
+void OnCommand(const HWND hwnd, int id, int notifycode, const HWND hCntrl)
+{
+	//handles WM_COMMAND message of the modal dialogbox
+	//char buf[128];
+	//wsprintf(buf, "HIT res %d", id);
+	//MessageBoxA(NULL, buf, "OK", MB_OK);
+
+
+switch (id)
+{
+
+	case IDC_SENDCHAT:{
+	HWND HWNDChatText = GetDlgItem(hwnd, IDC_CHATTEXT);
+	HWND HWNDChatType = GetDlgItem(hwnd, IDC_COMBOAA);
+		char buf[128];
+		char ChatText[50];
+		GetWindowText(HWNDChatText, ChatText, 50);
+		ChatType = ComboBox_GetCurSel(HWNDChatType);
+
+		wsprintf(buf, "[%s] %s\r\n", GetChatType(ChatType), ChatText);
+
+		AddChatLog(hwnd, buf);
+	}
+		break;
+
+	/* HIT HACK */
+	case IDC_STARTHITHACK:
+	{
+		HWND HWNDhitCount = GetDlgItem(hwnd, IDC_HITCOUNT);
+		char buf[128];
+		char hitcout[3];
+		GetWindowText(HWNDhitCount, hitcout, 3);
+
+		if (hithack == 0){
+			wsprintf(buf, "HITHACK ON! COUNT = %d\r\n", atoi(hitcout));
+			hithack = 1;
+			hithackCount = atoi(hitcout);
+		}
+		else{
+			wsprintf(buf, "HITHACK Off!\r\n");
+			hithack = 0;
+		}
+
+		AddLog(hwnd, buf);
+	}
+	break;
+
+	/* AUTOKILL */
+	case IDC_STARTAUTOKILL:
+	{
+            if (SendDlgItemMessage(hwnd, IDC_AUTOKILLHOVER, BM_GETCHECK, 0, 0) == BST_CHECKED)
+			{
+				autokillOnHover = 1;
+
+				AddLog(hwnd, "AUTOKILL HOVER ON\r\n");
+			}
+
+			HWND HWNDAKhitCount = GetDlgItem(hwnd, IDC_AUTOKILLNOATK);
+			char buf[128];
+			char hitcout[3];
+			GetWindowText(HWNDAKhitCount, hitcout, 3);
+
+			if (autokill == 0){
+				wsprintf(buf, "AUTOKILL ON! COUNT = %d\r\n", atoi(hitcout));
+				autokill = 1;
+				autokillHitCount = atoi(hitcout);
+			}
+			else{
+				wsprintf(buf, "AUTOKILL Off!\r\n");
+				autokill = 0;
+				autokillOnHover = 0;
+			}
+
+			AddLog(hwnd, buf);
+	}
+	break;
+
+	/* TELEPORT */
+	case IDC_TELEPORT:
+	{
+		//Get X
+		HWND HWND_Xcoord = GetDlgItem(hwnd, IDC_TELEPORTX);
+		char Xcoord[4];
+		GetWindowText(HWND_Xcoord, Xcoord, 4);
+		
+		//Get Y
+		HWND HWND_Ycoord = GetDlgItem(hwnd, IDC_TELEPORTY);
+		char Ycoord[4];
+		GetWindowText(HWND_Ycoord, Ycoord, 4);
+
+		BYTE X = atoi(Xcoord);
+		BYTE Y = atoi(Ycoord);
+
+		unsigned char STC[] = { 0xC1, 0x08, 0xD4, SET_NUMBERH(PlayerIndex), SET_NUMBERL(PlayerIndex), X, Y, 0x10 }; //  ? 69// hit ar trebuii sa fie ?
+		unsigned char CTS[] = { 0xC1, 0x06, 0xD4, X, Y, 0x10 }; //HEK
+		
+
+		SendMagicPacket(CTS, CTS[1]);
+		recvpacket(gs_socket, STC, sizeof(STC), 0);
+
+		Sleep(200);
+		
+		SendMagicPacket(CTS, CTS[1]);
+		recvpacket(gs_socket, STC, sizeof(STC), 0);
+
+		char buf[128];
+		wsprintf(buf,"TELEPORT -> X = %d  Y = %d\r\n",X,Y);
+		AddLog(hwnd, buf);
+	}
+	break;
+
+	case IDC_TESTBTN:
+		freopen("CONIN$", "r", stdin);
+		freopen("CONOUT$", "w", stdout);
+		break;
+
+	case IDOK:        //RETURN key pressed or 'ok' button selected
+	case IDCANCEL:    //ESC key pressed or 'cancel' button selected
+		EndDialog(hwnd, id);
+}
+}
+//=============================================================================
+INT_PTR OnInitDlg(const HWND hwnd, LPARAM lParam)
+{
+	//set the small icon for the dialog. IDI_APPLICATION icon is set by default 
+	//for winxp
+	SendMessage(hwnd, WM_SETICON, ICON_SMALL,
+		reinterpret_cast<LPARAM>(LoadImage(0, IDI_APPLICATION, IMAGE_ICON,
+		0, 0, LR_SHARED)));
+	//ensure focus rectangle is properly draw around control with focus
+	PostMessage(hwnd, WM_KEYDOWN, VK_TAB, 0);
+	return TRUE;
+}
+//=============================================================================
+inline int ErrMsg(const ustring& s)
+{
+	return MessageBox(0, s.c_str(), _T("ERROR"), MB_OK | MB_ICONEXCLAMATION);
+}
+//=============================================================================
+
+//MOVE !!!
+void AddLog(const HWND &hwnd, char * Mesaj, ...)
+{
+	HWND hwndOutput = GetDlgItem(hwnd, IDC_HACKLOGS);
+
+	int outLength = GetWindowTextLength(hwndOutput) + lstrlen(Mesaj) + 1;
+
+	std::vector<TCHAR> buf(outLength);
+	TCHAR *pbuf = &buf[0];
+
+	GetWindowText(hwndOutput, pbuf, outLength);
+
+	_tcscat_s(pbuf, outLength, Mesaj);
+
+	SetWindowText(hwndOutput, pbuf);
+}
+
+void AddChatLog(const HWND &hwnd, char * Mesaj, ...)
+{
+	// get edit control from dialog
+	HWND hwndOutput = GetDlgItem(hwnd, IDC_LOGS);
+
+	// get new length to determine buffer size
+	int outLength = GetWindowTextLength(hwndOutput) + lstrlen(Mesaj) + 1;
+
+	// create buffer to hold current and new text
+	std::vector<TCHAR> buf(outLength);
+	TCHAR *pbuf = &buf[0];
+
+	// get existing text from edit control and put into buffer
+	GetWindowText(hwndOutput, pbuf, outLength);
+
+	// append the newText to the buffer
+	_tcscat_s(pbuf, outLength, Mesaj);
+
+	// Set the text in the edit control
+	SetWindowText(hwndOutput, pbuf);
+
+}
+
+char *GetChatType(int index)
+{
+	switch (index)
+	{
+	case 0:
+		return "Normal";
+		break;
+	case 1:
+		return "Guild";
+		break;
+	case 2:
+		return "Alliance";
+		break;
+	case 3:
+		return "GENS";
+		break;
+
+	default:
+		return "UNKNOWN";
+		break;
+	}
+}
+/*
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR lpCmdLine, int nCmdShow) {
 
@@ -161,7 +433,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
 		if (LOWORD(wParam) == ID_DEC) {
 			freopen("CONIN$", "r", stdin);
 			freopen("CONOUT$", "w", stdout);
-			/* Special */
+			
 #define oXORFilterStart			0x00404C99
 			printf("[Hacker-XOR]");
 			for (int i = 0; i < 32; i++)
@@ -195,3 +467,4 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
 
 	return DefWindowProcW(hwnd, msg, wParam, lParam);
 }
+*/

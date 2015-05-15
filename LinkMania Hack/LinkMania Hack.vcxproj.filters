@@ -111,5 +111,8 @@
     <Image Include="..\..\..\GITHUB\antihack\Client\Ralukat.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="..\Ralukat.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

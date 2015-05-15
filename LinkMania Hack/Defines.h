@@ -78,12 +78,16 @@ DWORD GetByte(const LPVOID dwOffset, BYTE & btValue);
 //GLOBALS
 extern SOCKET gs_socket;
 extern int gsConnect;
-extern int autokill ;
+extern int hithack;
+extern int autokill;
+extern int autokillOnHover;
+extern int autokillHitCount;
 extern int maxhitcount;
 extern BYTE teleID[2];
 extern BYTE TELEcoord[2];
 extern int hithackCount;
 extern BYTE addr;
+extern int PlayerIndex;
 
 /* send */
 extern int (WINAPI *psend)(SOCKET socket, BYTE* buffer, int length, int flags) ;
@@ -123,3 +127,40 @@ extern int WINAPI myconnect(SOCKET s, const struct sockaddr *name, int namelen);
 #define ID_TELETESTY 6
 #define ID_DEC 7
 #define ID_BUFF 8
+
+
+//packet structs :)
+
+#pragma pack(push, 1)
+struct PBMSG_HEAD
+{
+public:
+	void set(LPBYTE lpBuf, BYTE head, BYTE size)
+	{
+		lpBuf[0] = 0xC1;
+		lpBuf[1] = size;
+		lpBuf[2] = head;
+	};
+	void setE(LPBYTE lpBuf, BYTE head, BYTE size)
+	{
+		lpBuf[0] = 0xC3;
+		lpBuf[1] = size;
+		lpBuf[2] = head;
+	};
+	BYTE c;
+	BYTE size;
+	BYTE headcode;
+};
+#pragma pack(pop)
+
+struct PMSG_JOINRESULT
+{
+	PBMSG_HEAD h;	// C1:F1
+	BYTE scode;	// 3
+	BYTE result;	// 4
+	BYTE NumberH;	// 5
+	BYTE NumberL;	// 6
+	BYTE CliVersion[5];	// 7
+};
+
+void parsePlayerIndex(PMSG_JOINRESULT* Data);

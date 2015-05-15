@@ -6,13 +6,21 @@
 
 SOCKET gs_socket;
 int gsConnect = 0;
+int hithack = 0;
+
 int autokill = 0;
+int autokillOnHover = 0; //folosinduse de Get HP Bar packet :)
+int autokillHitCount = 0;
+
 int maxhitcount = MaxHITCount;
 BYTE teleID[2];
 BYTE TELEcoord[2] = { 130, 130 };
 int hithackCount = 0;
 BYTE addr = 0;
+int PlayerIndex = 0;
 
+
+HINSTANCE hinst;
 //Classes init :)
 CHitHack HitHack;
 
@@ -43,7 +51,7 @@ extern  "C"  __declspec(dllexport) void __cdecl Mecanik()
 unsigned int __stdcall threadTEST(void* data)
 {
 
-	wWinMain(0, 0, 0, 1);
+	WinMain(hinst, 0, 0, 1);
 
 	return 1;
 }
@@ -59,6 +67,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,DWORD  ul_reason_for_call,PVOID lpReserve
 		SplashScreen();
 
 		//Window Vechi
+		hinst = hModule;
 		HANDLE hthreadTEST, hEvent;
 		hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 		hthreadTEST = (HANDLE)_beginthreadex(0, 0, &threadTEST, 0, 0, 0);
@@ -113,34 +122,35 @@ int WINAPI mysend(SOCKET s, BYTE* buf, int len, int flags) {
 	// ----
 	BYTE cheimagice[] = { 0xCF, 0x10, 0x4E, 0x3A, 0xC2, 0xD8, 0x5F, 0xAD, 0xE4, 0x02, 0x20, 0xDF, 0xEB, 0x42, 0x46, 0xED, 0xF0, 0x87, 0x2D, 0x6E, 0x21, 0x53, 0xA7, 0xCE, 0x83, 0xE1, 0xE7, 0xF6, 0xDF, 0x6F, 0x88, 0x1A };
 
-	if (autokill == 1)
+	if (hithack == 1)
 	{
 		HitHack.DoMobHit(gs_socket, buf, hithackCount);
 	}
 
 
-	BYTE * buf1 = new BYTE[buf[1]];
-	buf1 = buf;
 
+	if (buf[0] == (BYTE)0XC1){
 
-	if (buf1[0] == (BYTE)0XC1){
-
-		if (buf1[2] == (BYTE)0xFB){
-			
+		if (buf[2] == (BYTE)0xFB){
+			//decrypt packet :)
+			/*BYTE * buf1 = new BYTE[buf[1]];
+			buf1 = buf;
 			for (int i = buf1[1] - 1; i != 2; i += -1)
 			{
 				buf1[i] ^= buf1[i - 1] ^ cheimagice[i % 32];
-			}
+			}*/
+
+			BYTE *buf1 = DecodeMagicPacket(buf, buf[1]);
 
 			if (buf1[3] == (BYTE)0x07){
 
 				int index = MAKE_NUMBERW(buf[5], buf[4]); 
 				if (index < 8000)
 				{
-					printf("\n %.2X %.2X %.2X %.2X INDEX = %d\n", buf[4], buf[5], buf[6], buf[7], MAKE_NUMBERW(buf[5], buf[4]));
-					if (autokill == 1)
+					//printf("\n %.2X %.2X %.2X %.2X INDEX = %d\n", buf[4], buf[5], buf[6], buf[7], MAKE_NUMBERW(buf[5], buf[4]));
+					if (autokillOnHover == 1)
 					{
-						for (int i = 0; i < hithackCount; i++)
+						for (int i = 0; i < autokillHitCount; i++)
 						{
 							//unsigned char bufDC[] = { 0xC1, 0x07, 0x18, buf[5], buf[4], 0x84, 0xBD }; //  ? 69// hit ar trebuii sa fie ?
 							//printf("SENT DC PAK\n");
@@ -216,6 +226,13 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 			}
 		}
 	}*/
+	
+	//Get Player Index
+	if(buf[0] == 0xC1 && buf[2] == 0xF1 && buf[3] == 0x00)
+		parsePlayerIndex((PMSG_JOINRESULT*)buf);
+	
+
+
 	// Get server list
 	if (buf[0] == (BYTE)0xc1)
 	{
@@ -399,3 +416,6 @@ int WINAPI myconnect(SOCKET s, const struct sockaddr *name, int namelen) {
 
 	return dconnect(s, name, namelen);
 }
+
+//to be moved to protocol!
+void parsePlayerIndex(PMSG_JOINRESULT* Data) { PlayerIndex = MAKE_NUMBERW(Data->NumberH, Data->NumberL);  printf("Player Index = %d", PlayerIndex); };
