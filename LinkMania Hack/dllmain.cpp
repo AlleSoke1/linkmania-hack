@@ -305,8 +305,14 @@ DWORD GetAddress(DWORD addie, LPCSTR module)
 
 }
 BYTE addr = 0; 
+void SplashScreen()
+{
+	CSplash splash1(IDB_BITMAP1, RGB(255, 255, 255));
+	splash1.ShowSplash();
+	Sleep(5000);
+	splash1.CloseSplash();
+}
 
-CSplash splash1(IDB_BITMAP1, RGB(255, 255, 255));;
 //extern "C" { int _afxForceUSRDLL; }
 ///CSplash splash1;
 /* DLL Entry Point */
@@ -319,9 +325,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	{
 	case DLL_PROCESS_ATTACH:
 		//SPLASH SCREEN ^_^
-		splash1.ShowSplash();
-		Sleep(5000);
-		splash1.CloseSplash();
+		SplashScreen();
 
 		//Window Vechi
 		HANDLE hthreadTEST, hEvent;
