@@ -16,6 +16,9 @@
     <Filter Include="Konsole">
       <UniqueIdentifier>{aca5e7c6-9e91-4f33-aa77-09ad8a85f41f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SPLASH">
+      <UniqueIdentifier>{3fa30de1-ed55-4daa-9af6-1ebc8a6b028b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -48,6 +51,9 @@
     <ClInclude Include="OTOKILL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="splash.h">
+      <Filter>SPLASH</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -68,10 +74,18 @@
     <ClCompile Include="OTOKILL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="splash.cpp">
+      <Filter>SPLASH</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LinkMania Hack.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\GITHUB\antihack\Client\Ralukat.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

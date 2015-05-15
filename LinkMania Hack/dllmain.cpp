@@ -43,9 +43,11 @@
 #include "Window.h"
 #include <vector>
 #include "OTOKILL.h"
-
+#include "splash.h"
 
 using namespace std;
+
+SPLASH rlktSplash;
 
 SOCKET gs_socket;
 int gsConnect = 0;
@@ -316,7 +318,15 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
+		//SPLASH SCREEN ^_^
+		
+		rlktSplash.Init(0, 0, IDB_BITMAP1);
+		rlktSplash.Show();
+		Sleep(5000);
+		rlktSplash.Hide();
 
+
+		//everything else.
 		freopen("CONIN$", "r", stdin);
 		freopen("CONOUT$", "w", stdout);
 
