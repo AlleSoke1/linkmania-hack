@@ -51,9 +51,9 @@ void Console::InitCore()
 	//printf("MAC Address: %02X-%02X-%02X-%02X-%02X-%02X\n", 
 	//buf[0], buf[1], buf[2], buf[3], buf[4], buf[5]);
 	this->ConsoleOutput(1,"#######################################################");
-	this->ConsoleOutput(4,"[ LinkMania Hack ] Developed by Ralukat Labs (Alin1337) , Mecanik");
-	this->ConsoleOutput(4,"[ LinkMania Hack ] www.Addicted2.ro");
-	this->ConsoleOutput(4,"[ LinkMania Hack ] Version: 1.0.0.2");
+	this->ConsoleOutput(4,"[ LinkMania Hack ] Developed by (Alin1337) and (Mecanik1337)");
+	this->ConsoleOutput(4,"[ LinkMania Hack ] www.Addicted2.ro and Ralukat Labs");
+	this->ConsoleOutput(4,"[ LinkMania Hack ] Version: 1.0.0.1");
 	this->ConsoleOutput(1,"#######################################################");
 
 	//this->ConsoleOutput(4,"[ ---MAC--- ] %02X-%02X-%02X-%02X-%02X-%02X", buf[0], buf[1], buf[2], buf[3], buf[4], buf[5]);

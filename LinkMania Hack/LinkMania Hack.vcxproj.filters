@@ -19,6 +19,15 @@
     <Filter Include="SPLASH">
       <UniqueIdentifier>{3fa30de1-ed55-4daa-9af6-1ebc8a6b028b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Security">
+      <UniqueIdentifier>{1c7db3c6-b90d-457c-ab8a-a685fec46de5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AutoKill">
+      <UniqueIdentifier>{6d898f9a-1aac-4f80-922b-0a2c470a37c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HitHack">
+      <UniqueIdentifier>{2b40beb8-8279-47bc-a5be-d4690a0c83ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -45,14 +54,20 @@
     <ClInclude Include="Defines.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OTOKILL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="splash.h">
       <Filter>SPLASH</Filter>
+    </ClInclude>
+    <ClInclude Include="Security.h">
+      <Filter>Security</Filter>
+    </ClInclude>
+    <ClInclude Include="OTOKILL.h">
+      <Filter>AutoKill</Filter>
+    </ClInclude>
+    <ClInclude Include="HitHack.h">
+      <Filter>HitHack</Filter>
+    </ClInclude>
+    <ClInclude Include="Functions.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -68,14 +83,17 @@
     <ClCompile Include="g_Console.cpp">
       <Filter>Konsole</Filter>
     </ClCompile>
-    <ClCompile Include="Window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OTOKILL.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="splash.cpp">
       <Filter>SPLASH</Filter>
+    </ClCompile>
+    <ClCompile Include="Security.cpp">
+      <Filter>Security</Filter>
+    </ClCompile>
+    <ClCompile Include="OTOKILL.cpp">
+      <Filter>AutoKill</Filter>
+    </ClCompile>
+    <ClCompile Include="HitHack.cpp">
+      <Filter>HitHack</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
