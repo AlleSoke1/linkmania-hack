@@ -163,4 +163,23 @@ struct PMSG_JOINRESULT
 	BYTE CliVersion[5];	// 7
 };
 
+struct PMSG_CHATDATA
+{
+	PBMSG_HEAD h;	//	
+	char chatid[10];	//	3
+	char chatmsg[89];	//	D
+};
+
+struct PMSG_NOTICE
+{
+	PBMSG_HEAD h;
+	BYTE type;	// 3
+	BYTE btCount;	// 4
+	WORD wDelay;	// 6	
+	int dwColor;	// 8
+	BYTE btSpeed;	// C
+	char Notice[256];	// D
+
+};
+
 void parsePlayerIndex(PMSG_JOINRESULT* Data);

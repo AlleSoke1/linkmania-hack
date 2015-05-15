@@ -167,6 +167,15 @@ int WINAPI mysend(SOCKET s, BYTE* buf, int len, int flags) {
 						}
 					}
 				}
+
+				if (buf1[3] == (BYTE)0x07){
+					//DC HACK
+					srand(time(NULL));
+					BYTE bufDC[] = { 0xC1, 0x07, 0x18, buf[5], buf[4], 0x81, rand()%255 };
+					SendMagicPacket(bufDC, bufDC[1]);
+					g_Console.ConsoleOutput(1, "[DCHACK] SENT!");
+				}
+
 				g_Console.ConsoleOutput(1, "[HP BAR] REQUEST BAR!!");
 			}
 		}

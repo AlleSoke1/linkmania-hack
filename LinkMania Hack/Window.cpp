@@ -60,6 +60,7 @@ INT_PTR CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						  SendMessage(comboBox, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(_T("Alliance")));
 						  SendMessage(comboBox, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(_T("Gens")));
 						  SendMessage(comboBox, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(_T("ALL!!")));
+						  SendMessage(comboBox, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(_T("ADMIN!")));
 
 						  //Init dialog :)
 						  return OnInitDlg(hwnd, lParam);
@@ -79,16 +80,44 @@ void OnCommand(const HWND hwnd, int id, int notifycode, const HWND hCntrl)
 
 switch (id)
 {
-
+	/* TALK !! */
 	case IDC_SENDCHAT:{
 	HWND HWNDChatText = GetDlgItem(hwnd, IDC_CHATTEXT);
 	HWND HWNDChatType = GetDlgItem(hwnd, IDC_COMBOAA);
 		char buf[128];
-		char ChatText[50];
-		GetWindowText(HWNDChatText, ChatText, 50);
+		char ChatText[89];
+		GetWindowText(HWNDChatText, ChatText, 89);
 		ChatType = ComboBox_GetCurSel(HWNDChatType);
 
 		wsprintf(buf, "[%s] %s\r\n", GetChatType(ChatType), ChatText);
+		if (ChatType == 0)
+		{
+			PMSG_CHATDATA packet;
+			packet.h.c = 0xC1;
+			packet.h.headcode = 0x00;
+			packet.h.size = sizeof(packet);
+
+			memcpy(packet.chatid, "test", sizeof("test"));
+			memcpy(packet.chatmsg, ChatText, sizeof(ChatText));
+
+			SendMagicPacket((LPBYTE)&packet, packet.h.size);
+		}
+		else if (ChatType == 5)
+		{
+			PMSG_NOTICE pNotice;
+			pNotice.h.c = 0xC1;
+			pNotice.h.headcode = 0x0D;
+			pNotice.type = 0x00;
+			memcpy(pNotice.Notice, ChatText, sizeof(ChatText));
+
+			pNotice.h.size = sizeof(pNotice);
+			recvpacket(gs_socket, (BYTE*)&pNotice, pNotice.h.size, 0);
+			
+			//PHeadSetB((LPBYTE)pNotice, 0x0D, strlen(pNotice->Notice) + sizeof(PMSG_NOTICE)-sizeof(pNotice->Notice) + 1);
+		}
+
+
+
 
 		AddChatLog(hwnd, buf);
 	}
@@ -141,7 +170,6 @@ switch (id)
 				autokill = 0;
 				autokillOnHover = 0;
 			}
-
 			AddLog(hwnd, buf);
 	}
 	break;
@@ -181,13 +209,17 @@ switch (id)
 	break;
 
 	case IDC_TESTBTN:
+	{
 		freopen("CONIN$", "r", stdin);
 		freopen("CONOUT$", "w", stdout);
-		break;
 
-	case IDOK:        //RETURN key pressed or 'ok' button selected
-	case IDCANCEL:    //ESC key pressed or 'cancel' button selected
-		EndDialog(hwnd, id);
+		//TEST CRASH
+		BYTE CrashPacket[] = { 0xC1, 0x08, 0xFB, 0x07, 0x22, 0x99, 0x93, 0x82 };
+		SendMagicPacket(CrashPacket, sizeof(CrashPacket));
+	}
+	break;
+
+	
 }
 }
 //=============================================================================
