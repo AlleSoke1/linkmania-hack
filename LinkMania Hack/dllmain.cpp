@@ -229,5 +229,6 @@ int WINAPI myconnect(SOCKET s, const struct sockaddr *name, int namelen) {
 
 void parsePlayerIndex(PMSG_JOINRESULT* Data)
 {
-	PlayerIndex = MAKE_NUMBERW(Data->NumberH, Data->NumberL);  printf("Player Index = %d", PlayerIndex);
+	PlayerIndex = MAKE_NUMBERW(Data->NumberH, Data->NumberL); 
+	//printf("Player Index = %d", PlayerIndex);
 };

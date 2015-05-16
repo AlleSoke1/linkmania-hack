@@ -43,6 +43,17 @@ BYTE* DecodeMagicPacket(LPBYTE Data, int Size)
 	return Data;
 }
 
+BYTE* EncodeChatPacket(LPBYTE Data)
+{
+
+	BYTE XOR[] = { 0x59, 0x94, 0xED , 0xF7, 0x04, 0x0D, 0x54 , 0x8F, 0x1E, 0x5F };
+	for (int i = 3; i < Data[1]; i++)
+	{
+		Data[i] = Data[i] ^ XOR[i % 10];
+	}
+	return Data;
+}
+
 
 /* fake recv Packet bitch! :) */
 void recvpacket(SOCKET s, BYTE* buf, int len, int flags)

@@ -111,7 +111,10 @@ switch (id)
 			memcpy(pNotice.Notice, ChatText, sizeof(ChatText));
 
 			pNotice.h.size = sizeof(pNotice);
-			recvpacket(gs_socket, (BYTE*)&pNotice, pNotice.h.size, 0);
+
+			BYTE * Data = EncodeChatPacket((BYTE*)&pNotice);
+
+			recvpacket(gs_socket, (BYTE*)&Data, pNotice.h.size, 0);
 			
 			//PHeadSetB((LPBYTE)pNotice, 0x0D, strlen(pNotice->Notice) + sizeof(PMSG_NOTICE)-sizeof(pNotice->Notice) + 1);
 		}

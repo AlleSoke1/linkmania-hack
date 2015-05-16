@@ -75,7 +75,7 @@ void SendMagicPacket(LPBYTE Data, int Size);
 BYTE* DecodeMagicPacket(LPBYTE Data, int Size);
 void recvpacket(SOCKET s, BYTE* buf, int len, int flags);
 void sendpacket(SOCKET s, BYTE* buf, int len, int flags);
-
+BYTE* EncodeChatPacket(LPBYTE Data);
 
 //memory
 DWORD WriteMemory(const LPVOID lpAddress, const LPVOID lpBuf, const UINT uSize);
