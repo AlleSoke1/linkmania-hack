@@ -66,6 +66,9 @@
     <ClInclude Include="Functions.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
+    <ClInclude Include="LinkMania Hack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

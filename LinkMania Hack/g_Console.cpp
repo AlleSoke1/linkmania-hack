@@ -1,3 +1,10 @@
+// ================================================================= //
+// # LinkMania Hack For MuOnline	                               # //
+// # Project Started Mecanik1337 and Alin1337                      # //
+// # This file is part of the LinkMania Hack Project               # //
+// # www.Addicted2.ro || Ralukat Labs                              # //
+// ================================================================= //
+
 #define SECURITY_WIN32
 #define _CRT_SECURE_NO_DEPRECATE
 #include "StdAfx.h"
@@ -176,6 +183,11 @@ void Console::LoadConsoleCommands(char* gImput)
 	else if ((!strncmp(gImput, "/dump", 5)))
 	{
 		ShowTraffic = 1;
+	}
+
+	else if ((!strncmp(gImput, "/writedump", 5)))
+	{
+		SaveTraffic = 1;
 	}
 	
 }

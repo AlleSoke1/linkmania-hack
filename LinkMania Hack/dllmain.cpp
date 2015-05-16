@@ -1,5 +1,10 @@
-﻿// dllmain.cpp : Defines the entry point for the DLL application.
-//#define _CRT_SECURE_NO_WARNINGS
+﻿// ================================================================= //
+// # LinkMania Hack For MuOnline	                               # //
+// # Project Started Mecanik1337 and Alin1337                      # //
+// # This file is part of the LinkMania Hack Project               # //
+// # www.Addicted2.ro || Ralukat Labs                              # //
+// ================================================================= //
+
 #include "stdafx.h"
 #include "Defines.h"
 
@@ -19,10 +24,10 @@ int hithackCount = 0;
 BYTE addr = 0;
 int PlayerIndex = 0;
 
-
-HINSTANCE hinst;
 //Classes init :)
+HINSTANCE hinst;
 CHitHack HitHack;
+CLinkManiaHack LinkManiaHack;
 
 /* send */
 int (WINAPI *psend)(SOCKET socket, BYTE* buffer, int length, int flags) = NULL;
@@ -34,19 +39,6 @@ int WINAPI myrecv(SOCKET s, BYTE* buf, int len, int flags);
 int (WINAPI *dconnect)(SOCKET, const struct sockaddr*, int) = NULL;
 int WINAPI myconnect(SOCKET s, const struct sockaddr *name, int namelen);
 
-
-
-
-
-extern  "C"  __declspec(dllexport) void __cdecl Mecanik()
-{
-	Security.Init();
-	g_Console.ConsoleOutput(2, "[OK] Am pornit ! Comenzi Disponibile:");
-	g_Console.ConsoleOutput(2, "/exit   (close game)");
-	g_Console.ConsoleOutput(2, "/clear  (clear console)");
-	g_Console.ConsoleOutput(2, "/dump   (show traffic)");
-}
-
 /* THREAD WINDOW */
 unsigned int __stdcall threadTEST(void* data)
 {
@@ -56,6 +48,31 @@ unsigned int __stdcall threadTEST(void* data)
 	return 1;
 }
 
+extern  "C"  __declspec(dllexport) void __cdecl Mecanik(HMODULE hModule)
+{
+	//SPLASH SCREEN ^_^
+	SplashScreen();
+	Security.Init();
+	g_Console.ConsoleOutput(2, "[CORE]: OK Am pornit ! Comenzi Disponibile:");
+	g_Console.ConsoleOutput(2, "/exit        (close game)");
+	g_Console.ConsoleOutput(2, "/clear       (clear console)");
+	g_Console.ConsoleOutput(2, "/dump        (show traffic)");
+	g_Console.ConsoleOutput(2, "/writedump   (save traffic to .txt)");
+
+	//Window Vechi
+	hinst = hModule;
+	HANDLE hthreadTEST, hEvent;
+	hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	hthreadTEST = (HANDLE)_beginthreadex(0, 0, &threadTEST, 0, 0, 0);
+
+	//everything else.
+	freopen("CONIN$", "r", stdin);
+	freopen("CONOUT$", "w", stdout);
+
+	setvbuf(stdout, NULL, _IONBF, 0);
+	setvbuf(stderr, NULL, _IONBF, 0);
+}
+
 
 /* DLL Entry Point */
 BOOL APIENTRY DllMain( HMODULE hModule,DWORD  ul_reason_for_call,PVOID lpReserved)
@@ -63,30 +80,12 @@ BOOL APIENTRY DllMain( HMODULE hModule,DWORD  ul_reason_for_call,PVOID lpReserve
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
-		//SPLASH SCREEN ^_^
-		SplashScreen();
-
-		//Window Vechi
-		hinst = hModule;
-		HANDLE hthreadTEST, hEvent;
-		hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-		hthreadTEST = (HANDLE)_beginthreadex(0, 0, &threadTEST, 0, 0, 0);
-
-
-
-		//everything else.
-		freopen("CONIN$", "r", stdin);
-		freopen("CONOUT$", "w", stdout);
-
-		setvbuf(stdout, NULL, _IONBF, 0);
-		setvbuf(stderr, NULL, _IONBF, 0);
 
 		g_Console.InitCore();
-		Mecanik();
+		Mecanik(hModule);                    // asa nul poate chema prin export huh! ^_^
 		SetByte((PVOID)0x004D1E69, 0xEB);    // mu.exe cacat
-		SetByte((PVOID)(0x0095CD6D + 2), 1); //Min level Req to use Helper
-		SetByte((PVOID)(0x0095CD93 + 1), 1); //MuHelper Box error
-
+		SetByte((PVOID)(0x0095CD6D + 2), 1); // Min level Req to use Helper
+		SetByte((PVOID)(0x0095CD93 + 1), 1); // MuHelper Box error
 
 		/////////////////////////////////////////////////////
 		DisableThreadLibraryCalls(hModule);
@@ -129,58 +128,6 @@ int WINAPI mysend(SOCKET s, BYTE* buf, int len, int flags) {
 
 
 
-	if (buf[0] == (BYTE)0XC1){
-
-		if (buf[2] == (BYTE)0xFB){
-			//decrypt packet :)
-			/*BYTE * buf1 = new BYTE[buf[1]];
-			buf1 = buf;
-			for (int i = buf1[1] - 1; i != 2; i += -1)
-			{
-				buf1[i] ^= buf1[i - 1] ^ cheimagice[i % 32];
-			}*/
-
-			BYTE *buf1 = DecodeMagicPacket(buf, buf[1]);
-
-			if (buf1[3] == (BYTE)0x07){
-
-				int index = MAKE_NUMBERW(buf[5], buf[4]); 
-				if (index < 8000)
-				{
-					//printf("\n %.2X %.2X %.2X %.2X INDEX = %d\n", buf[4], buf[5], buf[6], buf[7], MAKE_NUMBERW(buf[5], buf[4]));
-					if (autokillOnHover == 1)
-					{
-						for (int i = 0; i < autokillHitCount; i++)
-						{
-							//unsigned char bufDC[] = { 0xC1, 0x07, 0x18, buf[5], buf[4], 0x84, 0xBD }; //  ? 69// hit ar trebuii sa fie ?
-							//printf("SENT DC PAK\n");
-							//SendMagicPacket(bufDC, bufDC[1]);
-						
-							unsigned char buf1X[] = { 0xC1, 0x07, 0x11, 0xFF, 0xFF, 0x78, 0x05 }; //  ? 69// hit ar trebuii sa fie ?
-							//  ^      ^
-							//( (WORD)(((BYTE)((y)&0xFF)) |   ((BYTE)((x)&0xFF)<<8 ))  )
-					
-							buf1X[3] = buf[5];
-							buf1X[4] = buf[4];
-
-							SendMagicPacket(buf1X, sizeof(buf1X));
-						}
-					}
-				}
-
-				if (buf1[3] == (BYTE)0x07){
-					//DC HACK
-					srand(time(NULL));
-					BYTE bufDC[] = { 0xC1, 0x07, 0x18, buf[5], buf[4], 0x81, rand()%255 };
-					SendMagicPacket(bufDC, bufDC[1]);
-					g_Console.ConsoleOutput(1, "[DCHACK] SENT!");
-				}
-
-				g_Console.ConsoleOutput(1, "[HP BAR] REQUEST BAR!!");
-			}
-		}
-	}
-
 	if (buf[2] == 0xFB)
 	{
 		printf("SEND ->");
@@ -191,195 +138,41 @@ int WINAPI mysend(SOCKET s, BYTE* buf, int len, int flags) {
 		printf("\n");
 	}
 
+	// if console
+	if (g_Console.ShowTraffic == 1){
+		g_Console.ConsoleOutput(4, "[CORE][SEND]: 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX", (BYTE*)buf[0], (BYTE*)buf[1], (BYTE*)buf[2], (BYTE*)buf[3], (BYTE*)buf[4], (BYTE*)buf[5], (BYTE*)buf[6], (BYTE*)buf[7], (BYTE*)buf[8], (BYTE*)buf[9], (BYTE*)buf[10], (BYTE*)buf[11]);
+	}
+
+	// if save packets
+	if (g_Console.SaveTraffic == 1){
+		LinkManiaHack.WriteSendPacketLog(buf, len, s);
+	}
+
 	return psend(s, buf, len, flags);
 }
 
 int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 {
-
-	//unsigned char XOR[] = { 0x04, 0x08, 0x0f, 0x10, 0x17, 0x2a, 0xff, 0x7b, 0x84, 0xb3 };
-
-	/*if (buf[2] == 0x00 || buf[2] == 0x02) {
-		for (int i = 3; i < buf[1]; i++) {
-			buf[i] ^= XOR[(i - 3) % 10];
-		}
-	}*/
-
-//	BYTE LiNU[10];
-//	BYTE LiNU2[100];
-
-	/*if (buf[0x00] == (BYTE)0xc1) {
-		if (buf[0x02] == (BYTE)0x02) {
-			if (buf[0x01] == (BYTE)0x68) {
-				for (int i = 0x03; i < 0x0d; i++) {
-					if (buf[i] != 0x00) {
-						LiNU[i - 3] = buf[i];
-					}
-					else {
-						break;
-					}
-				}
-				
-				for (int i = 0x15; i < 0x9d; i++) {
-					if (buf[i] != 0x00) {
-						LiNU2[i - 0x15] = buf[i];
-					}
-					else {
-						break;
-					}
-
-				}
-
-				g_Console.ConsoleOutput(5, "[World] %s : %s", LiNU, LiNU2);
-
-			}
-		}
-	}*/
 	
 	//Get Player Index
-	if(buf[0] == 0xC1 && buf[2] == 0xF1 && buf[3] == 0x00)
+	if (buf[0] == 0xC1 && buf[2] == 0xF1 && buf[3] == 0x00){
 		parsePlayerIndex((PMSG_JOINRESULT*)buf);
-	
-
-
-	// Get server list
-	if (buf[0] == (BYTE)0xc1)
-	{
-		if (buf[1] == (BYTE)0x04)
-		{
-			if (buf[2] == (BYTE)0x00)
-			{
-				g_Console.ConsoleOutput(5, "[ServerList] L-am primit!");
-
-			}
-
-		}
 	}
+	// Get server list
+	LinkManiaHack.GetServerList(buf);
 
 	//connect to gs -_- ?
-	if (buf[0] == (BYTE)0xc2) 
-	{
-		if (buf[1] == (BYTE)0x00)
-		{
-			if (buf[2] == (BYTE)0x0b)
-			{
-				g_Console.ConsoleOutput(5, "[ServerGS] Conectat!");
+	LinkManiaHack.GetServerList(buf);
 
-			}
-
-		}
-	}
-	//test mob hit?
-	if (buf[0] == (BYTE)0XC1){
-
-		if (buf[1] == (BYTE)0x18){
-
-			if (buf[2] == (BYTE)0xFB){
-
-				if (buf[3] == (BYTE)0x07){
-				
-				//	cout << "asta da?:" << buf[4] << endl;dllmain
-					g_Console.ConsoleOutput(1, "[HP BAR SENT] hit!!");
-				}
-
-			}
-		}
-
-	}
-
-	// C1 07 D4 skill hit
-	// C1 08 D4 monster dead ?
-	/*if (buf[0] == (BYTE)0xC1)
-	{
-		if (buf[1] == 0x20)
-		{
-			if (buf[2] == 0x11)
-			{
-				//buf[3] buf[4]
-				for (int i = 0; i < 5; i++)
-				{
-					if (autokill == 1)
-					{
-						unsigned char buf1[] = { 0xC1, 0x07, 0x11, 0x23, 0x93, 0x33, 0x69 }; //  ? 69// hit ar trebuii sa fie ?
-						int targetIndex = ((WORD)(buf[3] & 0x7F) << 8) | (BYTE)buf[3 + 1];//MAKE_NUMBERW(buf[3], buf[4]);
-						buf1[3] = (BYTE)((targetIndex >> 8) & 0x00FF);
-						buf1[4] = (BYTE)(targetIndex & 0x00FF);
-					
-						sendpacket(gs_socket, buf1, sizeof(buf1), 0);
-					}
-				}
-			}
-		}
-	} */
+	//get hp bar
+	LinkManiaHack.GetHPBar(buf);
 	
 	if (autokill == 2) // enable soon
 	{
-		if (buf[0] == (BYTE)0xC2)
-		{
-
-			if (buf[3] == 0x13)
-			{
-				//buf[5] buf[6] == 1
-				if (buf[4] == 1)
-				{
-
-					int targetIndex = MAKE_NUMBERW(buf[5], buf[6]);
-					cout << "TARGET INDEX" << targetIndex << endl;
-					for (int i = 0; i < hithackCount; i++)
-					{
-
-						unsigned char buf1[] = { 0xC1, 0x07, 0x11, 0xFF, 0xFF, 0x78, 0x05 }; //  ? 69// hit ar trebuii sa fie ?
-																//  ^      ^
-						//( (WORD)(((BYTE)((y)&0xFF)) |   ((BYTE)((x)&0xFF)<<8 ))  )
-						int targetIndex = MAKE_NUMBERW(buf[5], buf[6]);
-						buf1[3] = (BYTE)((targetIndex >> 8) & 0x00FF);
-						buf1[4] = (BYTE)(targetIndex & 0x00FF);
-
-						SendMagicPacket(buf1, sizeof(buf1));
-					}
-				}
-				if (buf[4] > 1)
-				{
-					BYTE _start = 0;
-					for (int i = 0; i < buf[4]; i++)
-					{
-			
-						int targetIndex = MAKE_NUMBERW(buf[5+_start], buf[6+_start]);
-						cout << "TARGET INDEX" << targetIndex << endl;
-						for (int i = 0; i < hithackCount; i++)
-						{
-							unsigned char buf1[] = { 0xC1, 0x07, 0x11, 0xFF, 0xFF, 0x78, 0x05 }; //  ? 69// hit ar trebuii sa fie ?
-																	//  ^      ^
-							
-							//( (WORD)(((BYTE)((y)&0xFF)) |   ((BYTE)((x)&0xFF)<<8 ))  )
-							int targetIndex = MAKE_NUMBERW(buf[5 + _start], buf[6 + _start]);
-							buf1[3] = (BYTE)((targetIndex >> 8) & 0x00FF);
-							buf1[4] = (BYTE)(targetIndex & 0x00FF);
-
-							Sleep(10); 
-							SendMagicPacket(buf1, sizeof(buf1));
-							
-						}
-						_start += 10;
-					}
-				}
-			}
-		}
+		LinkManiaHack.AutoKill(buf);
 	}
 
-	//cout << "[recv]: 0x%02hX / 0x%02hX / 0x%02hX / 0x%02hX / 0x%02hX / 0x%02hX " << (unsigned char)buf[0] << (unsigned char)buf[1] << (unsigned char)buf[2] << (unsigned char)buf[3] << (unsigned char)buf[4] << (unsigned char)buf[5] << endl;
 
-	/*	FILE *fileAS1;
-		fopen_s(&fileAS1, "LMHack-PacketFilter.txt", "a+");
-		fprintf(fileAS1, "[RECV][buf:");
-		for (int i = 0; i < len; ++i)
-		{
-			fprintf(fileAS1, "%02hX ", (BYTE)buf[i]);
-		}
-		fprintf(fileAS1, "][Len: %d][Socket: %d]", len, s);
-		fprintf(fileAS1, "\n");
-		fclose(fileAS1);
-	*/
 	if (buf[0] == 0xC1)
 	{
 		if (buf[2] == 0xD4)
@@ -399,9 +192,17 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 		}
 		printf("\n");
 	}
-	
-			///\g_Console.ConsoleOutput(4, "[RECV]: 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX", (BYTE*)buf[0], (BYTE*)buf[1], (BYTE*)buf[2], (BYTE*)buf[3], (BYTE*)buf[4], (BYTE*)buf[5], (BYTE*)buf[6], (BYTE*)buf[7], (BYTE*)buf[8], (BYTE*)buf[9], (BYTE*)buf[10], (BYTE*)buf[11]);
-	
+
+	// if console
+	if (g_Console.ShowTraffic == 1){
+		g_Console.ConsoleOutput(4, "[CORE][RECV]: 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX", (BYTE*)buf[0], (BYTE*)buf[1], (BYTE*)buf[2], (BYTE*)buf[3], (BYTE*)buf[4], (BYTE*)buf[5], (BYTE*)buf[6], (BYTE*)buf[7], (BYTE*)buf[8], (BYTE*)buf[9], (BYTE*)buf[10], (BYTE*)buf[11]);
+	}
+
+	// if save packets
+	if (g_Console.SaveTraffic == 1){
+		LinkManiaHack.WriteRecvPacketLog(buf, len, s);
+	}
+
 	return precv(s, buf, len, flags);
 }
 
@@ -426,5 +227,7 @@ int WINAPI myconnect(SOCKET s, const struct sockaddr *name, int namelen) {
 	return dconnect(s, name, namelen);
 }
 
-//to be moved to protocol!
-void parsePlayerIndex(PMSG_JOINRESULT* Data) { PlayerIndex = MAKE_NUMBERW(Data->NumberH, Data->NumberL);  printf("Player Index = %d", PlayerIndex); };
+void parsePlayerIndex(PMSG_JOINRESULT* Data)
+{
+	PlayerIndex = MAKE_NUMBERW(Data->NumberH, Data->NumberL);  printf("Player Index = %d", PlayerIndex);
+};

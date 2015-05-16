@@ -1,7 +1,9 @@
-// stdafx.h : include file for standard system include files,
-// or project specific include files that are used frequently, but
-// are changed infrequently
-//
+// ================================================================= //
+// # LinkMania Hack For MuOnline	                               # //
+// # Project Started Mecanik1337 and Alin1337                      # //
+// # This file is part of the LinkMania Hack Project               # //
+// # www.Addicted2.ro || Ralukat Labs                              # //
+// ================================================================= //
 
 #pragma once
 // -------------------------------------------------------------------

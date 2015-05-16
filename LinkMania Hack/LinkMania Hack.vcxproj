@@ -57,7 +57,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>R:\Games\Linkmania BETA\</OutDir>
+    <OutDir>C:\Users\Mecanik1337\Downloads\LinkMania</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -65,7 +65,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ALIN1337|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>R:\Games\Linkmania BETA\</OutDir>
+    <OutDir>C:\Users\Mecanik1337\Downloads\LinkMania</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -125,6 +125,7 @@
     <ClInclude Include="Functions.h" />
     <ClInclude Include="g_Console.h" />
     <ClInclude Include="HitHack.h" />
+    <ClInclude Include="LinkMania Hack.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Security.h" />
     <ClInclude Include="splash.h" />

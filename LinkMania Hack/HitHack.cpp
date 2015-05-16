@@ -26,6 +26,7 @@ void CHitHack::DoMobHit(SOCKET gs_socket, BYTE* buf, int hithackCount) //class f
 			buf1[5] = buf[5];
 			buf1[6] = buf[6];
 			//g_Console.ConsoleOutput(5, "[HitHack]: PlayerHit called"); //because called too many times.
+			// LOL i knowed that but i was too sleepy ! ^_^
 
 			sendpacket(gs_socket, buf1, sizeof(buf1), 0);
 		}
