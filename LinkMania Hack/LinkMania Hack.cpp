@@ -44,7 +44,7 @@ void CLinkManiaHack::GetServerConnect(BYTE* buf)
 
 void CLinkManiaHack::GetHPBar(BYTE* buf)
 {
-	if (buf[0] == (BYTE)0XC1){
+	if (buf[0] == (BYTE)0xC1){
 
 		if (buf[1] == (BYTE)0x18){
 
@@ -109,56 +109,61 @@ void CLinkManiaHack::GetPost(BYTE* buf)
 
 void CLinkManiaHack::AutoKill(BYTE* buf)
 {
-
 	// need developing !
-	if (buf[0] == (BYTE)0XC1){
+	if (buf[0] == (BYTE)0xC1){
 
 		if (buf[2] == (BYTE)0xFB){
-			//decrypt packet :)
-			/*BYTE * buf1 = new BYTE[buf[1]];
-			buf1 = buf;
-			for (int i = buf1[1] - 1; i != 2; i += -1)
-			{
-			buf1[i] ^= buf1[i - 1] ^ cheimagice[i % 32];
-			}*/
+			
+			if (autokill == 1)
+			{//decrypt packet :)
+				/*BYTE cheimagice[] = { 0xCF, 0x10, 0x4E, 0x3A, 0xC2, 0xD8, 0x5F, 0xAD, 0xE4, 0x02, 0x20, 0xDF, 0xEB, 0x42, 0x46, 0xED, 0xF0, 0x87, 0x2D, 0x6E, 0x21, 0x53, 0xA7, 0xCE, 0x83, 0xE1, 0xE7, 0xF6, 0xDF, 0x6F, 0x88, 0x1A };
+				BYTE * buf1 = new BYTE[buf[1]];
+				buf1 = buf;
+				
 
-			BYTE *buf1 = DecodeMagicPacket(buf, buf[1]);
+				for (int i = buf1[1] - 1; i != 2; i += -1)
+				{
+					buf1[i] ^= buf1[i - 1] ^ cheimagice[i % 32];
+				}*/
+				BYTE *buf1 = DecodeMagicPacket(buf, buf[1]);
 
 			if (buf1[3] == (BYTE)0x07){
-
-				int index = MAKE_NUMBERW(buf[5], buf[4]);
-				if (index < 8000)
-				{
-					//printf("\n %.2X %.2X %.2X %.2X INDEX = %d\n", buf[4], buf[5], buf[6], buf[7], MAKE_NUMBERW(buf[5], buf[4]));
-					if (autokillOnHover == 1)
+			
+				int index = MAKE_NUMBERW(buf1[5], buf1[4]);
+					if (index < 8000)
 					{
-						for (int i = 0; i < autokillHitCount; i++)
+						//printf("\n %.2X %.2X %.2X %.2X INDEX = %d\n", buf[4], buf[5], buf[6], buf[7], MAKE_NUMBERW(buf[5], buf[4]));
+						if (autokillOnHover == 1)
 						{
-							//unsigned char bufDC[] = { 0xC1, 0x07, 0x18, buf[5], buf[4], 0x84, 0xBD }; //  ? 69// hit ar trebuii sa fie ?
-							//printf("SENT DC PAK\n");
-							//SendMagicPacket(bufDC, bufDC[1]);
+							for (int i = 0; i < autokillHitCount; i++)
+							{
+								//unsigned char bufDC[] = { 0xC1, 0x07, 0x18, buf[5], buf[4], 0x84, 0xBD }; //  ? 69// hit ar trebuii sa fie ?
+								//printf("SENT DC PAK\n");
+								//SendMagicPacket(bufDC, bufDC[1]);
 
-							unsigned char buf1X[] = { 0xC1, 0x07, 0x11, 0xFF, 0xFF, 0x78, 0x05 }; //  ? 69// hit ar trebuii sa fie ?
-							//  ^      ^
-							//( (WORD)(((BYTE)((y)&0xFF)) |   ((BYTE)((x)&0xFF)<<8 ))  )
+								unsigned char buf1X[] = { 0xC1, 0x07, 0x11, 0xFF, 0xFF, 0x78, 0x05 }; //  ? 69// hit ar trebuii sa fie ?
+								//  ^      ^
+								//( (WORD)(((BYTE)((y)&0xFF)) |   ((BYTE)((x)&0xFF)<<8 ))  )
 
-							buf1X[3] = buf[5];
-							buf1X[4] = buf[4];
+								buf1X[3] = buf1[5];
+								buf1X[4] = buf1[4];
 
-							SendMagicPacket(buf1X, sizeof(buf1X));
+								SendMagicPacket(buf1X, sizeof(buf1X));
+							}
 						}
 					}
+
+					if (buf[3] == (BYTE)0x07){
+						//DC HACK
+						srand(time(NULL));
+						BYTE bufDC[] = { 0xC1, 0x07, 0x18, buf1[5], buf1[4], 0x81, rand() % 255 };
+						SendMagicPacket(bufDC, bufDC[1]);
+						g_Console.ConsoleOutput(1, "[DCHACK] SENT!");
+					}
+
+					g_Console.ConsoleOutput(1, "[HP BAR] REQUEST BAR!!");
 				}
 
-				if (buf1[3] == (BYTE)0x07){
-					//DC HACK
-					srand(time(NULL));
-					BYTE bufDC[] = { 0xC1, 0x07, 0x18, buf[5], buf[4], 0x81, rand() % 255 };
-					SendMagicPacket(bufDC, bufDC[1]);
-					g_Console.ConsoleOutput(1, "[DCHACK] SENT!");
-				}
-
-				g_Console.ConsoleOutput(1, "[HP BAR] REQUEST BAR!!");
 			}
 		}
 	}
