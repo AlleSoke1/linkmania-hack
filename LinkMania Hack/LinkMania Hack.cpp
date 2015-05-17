@@ -107,7 +107,7 @@ void CLinkManiaHack::GetPost(BYTE* buf)
 
 }
 
-void CLinkManiaHack::DCHack(BYTE* buf)
+void CLinkManiaHack::AutoKill(BYTE* buf)
 {
 
 	// need developing !
@@ -164,7 +164,7 @@ void CLinkManiaHack::DCHack(BYTE* buf)
 	}
 }
 
-void CLinkManiaHack::AutoKill(BYTE* buf)
+void CLinkManiaHack::DCHack(BYTE* buf)
 {
 
 	if (buf[0] == (BYTE)0xC2)

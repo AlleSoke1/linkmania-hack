@@ -84,10 +84,15 @@ switch (id)
 	case IDC_SENDCHAT:{
 	HWND HWNDChatText = GetDlgItem(hwnd, IDC_CHATTEXT);
 	HWND HWNDChatType = GetDlgItem(hwnd, IDC_COMBOAA);
-		char buf[128];
-		char ChatText[89];
-		GetWindowText(HWNDChatText, ChatText, 89);
-		ChatType = ComboBox_GetCurSel(HWNDChatType);
+	HWND HWNDChatSender = GetDlgItem(hwnd, IDC_SENDAS);
+
+	char buf[128];
+	char ChatText[89];
+	GetWindowText(HWNDChatText, ChatText, 89);
+	ChatType = ComboBox_GetCurSel(HWNDChatType);
+
+	char SendAs[11];
+	GetWindowText(HWNDChatSender, SendAs, 11);
 
 		wsprintf(buf, "[%s] %s\r\n", GetChatType(ChatType), ChatText);
 		if (ChatType == 0)
@@ -97,7 +102,19 @@ switch (id)
 			packet.h.headcode = 0x00;
 			packet.h.size = sizeof(packet);
 
-			memcpy(packet.chatid, "test", sizeof("test"));
+			memcpy(packet.chatid, SendAs, strlen(SendAs));
+			memcpy(packet.chatmsg, ChatText, sizeof(ChatText));
+
+			SendMagicPacket((LPBYTE)&packet, packet.h.size);
+		}
+		else if (ChatType == 1)
+		{
+			PMSG_CHATDATA packet;
+			packet.h.c = 0xC1;
+			packet.h.headcode = 0x00;
+			packet.h.size = sizeof(packet);
+
+			memcpy(packet.chatid, SendAs, strlen(SendAs));
 			memcpy(packet.chatmsg, ChatText, sizeof(ChatText));
 
 			SendMagicPacket((LPBYTE)&packet, packet.h.size);
@@ -216,9 +233,73 @@ switch (id)
 		freopen("CONIN$", "r", stdin);
 		freopen("CONOUT$", "w", stdout);
 
-		//TEST CRASH
+		setvbuf(stdout, NULL, _IONBF, 0);
+		setvbuf(stderr, NULL, _IONBF, 0);
+
+
+		BYTE WarePacket[] = { 0xC2, 0x00, 0xBC, 0x31, 0x00, 0x0E, 0x00, 0x24, 0x56, 0x4A, 0x11, 0x00, 0xA0, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x02, 0x28, 0x00, 0x3E, 0x00, 0x06, 0xB0, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x04, 0x58, 0x00, 0x05, 0x00, 0x00, 0xE0, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x05, 0x07, 0x00, 0x38, 0x00, 0x05, 0x80, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x07, 0x55, 0x00, 0x03, 0x00, 0x00, 0xE0, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x10, 0x0A, 0x82, 0x50, 0x01, 0x00, 0x20 , 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x11, 0x01, 0x00, 0x54, 0x00, 0x09, 0xA0, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x13, 0x31, 0x18, 0x59, 0x00, 0x00, 0x70, 0xFF, 0xFE, 0xFF, 0xFF, 0xFF, 0xFF, 0x17, 0x5A, 0x00, 0x1B, 0x00, 0x00, 0xE0, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x21, 0x24, 0x02, 0x45, 0x04, 0x00, 0x90, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x33, 0x01, 0x00, 0x53, 0x00, 0x05, 0xB0, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x60, 0x24, 0x00, 0x3E, 0x20, 0x00, 0x70, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x70, 0x57, 0x00, 0x02, 0x00, 0x00, 0xE0, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x71, 0x57, 0x00, 0x01, 0x00, 0x00, 0xE0, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+		recvpacket(gs_socket, WarePacket, MAKE_NUMBERW(WarePacket[1],WarePacket[2]), 0);
+
+		/*
+		PMSG_DEFAULT pMsg;
+		PHeadSetB((LPBYTE)&pMsg, 0x82, sizeof(pMsg));
+		SendMagicPacket((LPBYTE)&pMsg, pMsg.h.size);
+		*/
+		/*	//TEST CRASH
 		BYTE CrashPacket[] = { 0xC1, 0x08, 0xFB, 0x07, 0x22, 0x99, 0x93, 0x82 };
 		SendMagicPacket(CrashPacket, sizeof(CrashPacket));
+
+		lpCharObj	lpPlayer;
+		lpPlayer = &*(ObjectCharacter*)UserObjectStruct;
+
+		lpPlayer->Level = 400;
+		lpPlayer->AddPoint = 1337;
+		lpPlayer->MoneyInventory = 2000000000;
+
+
+	
+		GAMESHOP_ANS_POINT pPoint;
+		PHeadSubSetB((LPBYTE)&pPoint, 0xD2, 0x1, sizeof(GAMESHOP_ANS_POINT));
+		// ----
+		pPoint.WCoinC[0] = 1337;
+		pPoint.WCoinC[1] = 1337;
+		pPoint.WCoinP[0] = 1337;
+		pPoint.WCoinP[1] = 1337;
+		pPoint.GoblinPoint = 13371337;
+		recvpacket(gs_socket,(BYTE*)&pPoint, pPoint.h.size, 0);
+	
+
+		//
+
+
+		NEWS_REQ_NEWS pRequest2;
+		pRequest2.h.set((LPBYTE)&pRequest2, 0xFE, sizeof(pRequest2));
+		pRequest2.ID = 0xA;
+		SendMagicPacket((LPBYTE)&pRequest2, pRequest2.h.size);
+		
+		PMSG_TRADE_OKBUTTON pMsg;
+		pMsg.h.c = 0xC1;
+		pMsg.h.headcode = 0x3C;
+		pMsg.h.size = sizeof(pMsg);//, 0x3C, sizeof(pMsg));
+		pMsg.Flag = 1;
+		recvpacket(gs_socket, (BYTE*)&pMsg, pMsg.h.size, 0);
+		
+		PMSG_TRADE_OKBUTTON pMsg2;
+		pMsg2.h.c = 0xC1;
+		pMsg2.h.headcode = 0x3C;
+		pMsg2.h.size = sizeof(pMsg);//, 0x3C, sizeof(pMsg));
+		pMsg2.Flag = 1;
+		SendMagicPacket((BYTE*)&pMsg2, pMsg2.h.size);
+
+		CONNECTEX_LOGIN pRequest;
+		pRequest.h.set((LPBYTE)&pRequest, 0xFB, 12, sizeof(CONNECTEX_LOGIN));
+		memcpy(pRequest.AccountID, "MeRonin", 10);
+		memcpy(pRequest.Password, "annegeddes", 10);
+		memcpy(pRequest.Name, "%d%s", 10);
+		pRequest.TickCount = GetTickCount();
+		SendMagicPacket((LPBYTE)&pRequest, pRequest.h.size);
+		*/
+		AddLog(hwnd, "OK TEST BTN\r\n");
 	}
 	break;
 

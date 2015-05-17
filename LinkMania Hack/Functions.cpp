@@ -51,6 +51,7 @@ BYTE* EncodeChatPacket(LPBYTE Data)
 	{
 		Data[i] = Data[i] ^ XOR[i % 10];
 	}
+
 	return Data;
 }
 
@@ -91,4 +92,29 @@ void SplashScreen()
 	splash1.ShowSplash();
 	Sleep(5000);
 	splash1.CloseSplash();
+}
+
+
+//protocol
+void PHeadSubSetB(LPBYTE lpBuf, BYTE head, BYTE sub, int size)
+{
+	lpBuf[0] = 0xC1;	// Packets
+	lpBuf[1] = size;
+	lpBuf[2] = head;
+	lpBuf[3] = sub;
+}
+
+void PHeadSetB(LPBYTE lpBuf, BYTE head, int size)
+{
+	lpBuf[0] = 0xC1;		// Packets
+	lpBuf[1] = size;
+	lpBuf[2] = head;
+}
+
+void PHeadSetW(LPBYTE lpBuf, BYTE head, int size)
+{
+	lpBuf[0] = 0xC2;	// Packets Header
+	lpBuf[1] = SET_NUMBERH(size);
+	lpBuf[2] = SET_NUMBERL(size);
+	lpBuf[3] = head;
 }
