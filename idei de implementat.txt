@@ -1,0 +1,11 @@
+-Autokill pe baza la packetu de la monstru
+-Auto reset la 400
+-Auto buff odata la 30min (< lvl 220)
+-Auto teleport back to die point in case you die
+-Alerte SMS/Mail ?? --extra cost , via provider api:)
+
+Pentru program:
+  - SERVER LICENTA + verificate licenta! (mac+computername+ inca ceva sa se faca un key mare)
+
+Pentru interfata:
+  - TAB CONTROL !!

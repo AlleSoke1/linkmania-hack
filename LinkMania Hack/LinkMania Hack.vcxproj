@@ -117,6 +117,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <Text Include="..\idei de implementat.txt" />
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
