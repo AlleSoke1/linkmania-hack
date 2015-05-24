@@ -68,6 +68,11 @@ void PHeadSetW(LPBYTE lpBuf, BYTE head, int size);
 //window
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 BOOL CALLBACK DialogProc(HWND hWindow, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+void AddChatLog(const HWND &hwnd, char * Mesaj, ...);
+
+
+
 //detours
 void DetourAndErrorCheck(PVOID* pFunctionToDetour, PVOID pReplacement, const char* functionName);
 void CheckAndDetach(PVOID* pDetouredFunction, PVOID pReplacement, const char* functionName);
@@ -101,7 +106,7 @@ extern BYTE TELEcoord[2];
 extern int hithackCount;
 extern BYTE addr;
 extern int PlayerIndex;
-
+extern BYTE* XorKeys;
 /* send */
 extern int (WINAPI *psend)(SOCKET socket, BYTE* buffer, int length, int flags) ;
 extern int WINAPI mysend(SOCKET s, BYTE* buf, int len, int flags);
@@ -220,6 +225,13 @@ struct PMSG_CHATDATA
 	char chatmsg[89];	//	D
 };
 
+
+struct PMSG_XORKEYS
+{
+	PBMSG_HEAD h;	//	
+	BYTE subhead;
+	BYTE XORKEYES[10];	//	4
+};
 struct PMSG_NOTICE
 {
 	PBMSG_HEAD h;
@@ -405,3 +417,6 @@ typedef struct	//-> InDev (size: 6012)
 	/*+6011*/	BYTE	Unknown6011;
 } ObjectCharacter, *lpCharObj;
 #pragma pack(pop)
+
+void ParseXorKeys(PMSG_XORKEYS * recv);
+void ParseChat(PMSG_CHATDATA * recv);

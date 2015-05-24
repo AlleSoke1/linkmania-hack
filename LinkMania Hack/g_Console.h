@@ -11,7 +11,7 @@
 #include "windows.h"
 #include <stdio.h>
 // -----------------------------------------------------------------------
-#define CONSOLETITLE "[ LinkMania Hack ] By Mecanik1337, Alin1337 and Ralukat Labs!"
+#define CONSOLETITLE "Ralukat Labs!"
 // -----------------------------------------------------------------------
 
 class Console

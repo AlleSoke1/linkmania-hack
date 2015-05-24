@@ -50,6 +50,7 @@ bool CSecurity::Checking(LPCSTR MacID)
 		"00-0C-29-B5-C8-FA",  // Alinu2  :d
 		"BC-5F-F4-74-54-4A",  // MECANIK :d
 		"B4-82-FE-68-1F-F5",  // MECANIK2 :d
+		"08-00-27-22-B2-82",
 	};
 
 	for(int x=0; x<MacCount; x++)

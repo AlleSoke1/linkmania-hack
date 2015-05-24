@@ -81,7 +81,7 @@ void sendpacket(SOCKET s, BYTE* buf, int len, int flags)
 	printf("\n");
 	*///g_Console.ConsoleOutput(1, "Packet sent: 0x%02X", (BYTE)Packet);
 
-	psend(s, buf, len, flags); // was psend2
+	psend(s, buf, len, flags); // was psend2 , well both ways it doesn't work.
 }
 
 

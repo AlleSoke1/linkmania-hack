@@ -23,6 +23,8 @@ BYTE TELEcoord[2] = { 130, 130 };
 int hithackCount = 0;
 BYTE addr = 0;
 int PlayerIndex = 0;
+BYTE *XorKeys;
+
 
 //Classes init :)
 HINSTANCE hinst;
@@ -156,6 +158,23 @@ int WINAPI mysend(SOCKET s, BYTE* buf, int len, int flags) {
 
 int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 {
+
+	//get chat xor keys
+	if (buf[0] == 0xC1 && buf[2] == 0xFB && buf[3] == 0x11)
+	{
+		ParseXorKeys((PMSG_XORKEYS*)buf);
+	}
+
+	//get chat 
+	if (buf[0] == 0xC1 && buf[2] == 0x00)
+	{
+		for (int i = 3; i < buf[1]; i++)
+		{
+			buf[i] ^= XorKeys[i % 10];
+		}
+
+		ParseChat((PMSG_CHATDATA*)buf);
+	}
 	
 	//Get Player Index
 	if (buf[0] == 0xC1 && buf[2] == 0xF1 && buf[3] == 0x00){
@@ -171,8 +190,6 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 	//get hp bar
 	//LinkManiaHack.GetHPBar(buf);
 	
-
-
 
 	if (buf[0] == 0xC2 && buf[3] == 0x31) //warehouse
 	{
@@ -223,3 +240,14 @@ void parsePlayerIndex(PMSG_JOINRESULT* Data)
 	PlayerIndex = MAKE_NUMBERW(Data->NumberH, Data->NumberL); 
 	//printf("Player Index = %d", PlayerIndex);
 };
+
+
+void ParseXorKeys(PMSG_XORKEYS * recv)
+{
+	XorKeys = recv->XORKEYES;
+}
+
+void ParseChat(PMSG_CHATDATA * recv)
+{
+	AddChatLog(GetActiveWindow(),recv->chatmsg);
+}
