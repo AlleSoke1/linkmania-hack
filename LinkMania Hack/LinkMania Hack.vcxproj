@@ -65,7 +65,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ALIN1337|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>..\..\ASDASD</OutDir>
+    <OutDir>..\..\..\..\Games\Linkmania BETA</OutDir>
+    <TargetName>LM2Hack</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

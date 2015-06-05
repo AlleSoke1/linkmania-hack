@@ -107,6 +107,8 @@ extern int hithackCount;
 extern BYTE addr;
 extern int PlayerIndex;
 extern BYTE* XorKeys;
+extern HWND ChatLogsHANDLE;
+
 /* send */
 extern int (WINAPI *psend)(SOCKET socket, BYTE* buffer, int length, int flags) ;
 extern int WINAPI mysend(SOCKET s, BYTE* buf, int len, int flags);

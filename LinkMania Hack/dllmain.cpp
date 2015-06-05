@@ -25,6 +25,7 @@ BYTE addr = 0;
 int PlayerIndex = 0;
 BYTE *XorKeys;
 
+HWND ChatLogsHANDLE;
 
 //Classes init :)
 HINSTANCE hinst;
@@ -88,6 +89,9 @@ BOOL APIENTRY DllMain( HMODULE hModule,DWORD  ul_reason_for_call,PVOID lpReserve
 		SetByte((PVOID)0x004D1E69, 0xEB);    // mu.exe cacat
 		SetByte((PVOID)(0x0095CD6D + 2), 1); // Min level Req to use Helper
 		SetByte((PVOID)(0x0095CD93 + 1), 1); // MuHelper Box error
+
+		//init xor key array
+		XorKeys = new BYTE[10];
 
 		/////////////////////////////////////////////////////
 		DisableThreadLibraryCalls(hModule);
@@ -160,12 +164,23 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 {
 
 	//get chat xor keys
-	if (buf[0] == 0xC1 && buf[2] == 0xFB && buf[3] == 0x11)
-	{
-		ParseXorKeys((PMSG_XORKEYS*)buf);
+	/*if (buf[0] == 0xC1)
+		if(buf[2] == 0xFB)
+			if(buf[3] == 0x11)
+			{
+				g_Console.ConsoleOutput(4, "[HIT XORKEYS]: 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX 0x%02hX", (BYTE*)buf[0], (BYTE*)buf[1], (BYTE*)buf[2], (BYTE*)buf[3], (BYTE*)buf[4], (BYTE*)buf[5], (BYTE*)buf[6], (BYTE*)buf[7], (BYTE*)buf[8], (BYTE*)buf[9], (BYTE*)buf[10], (BYTE*)buf[11]);
+				ParseXorKeys((PMSG_XORKEYS*)buf);
+			}*/
+
+	if (buf[0] == (byte)0xc1 && buf[2] == (byte)0xfb && buf[3] == (byte)0x11) {
+		for (int i = 4; i < buf[1]; i++) {
+			XorKeys[i - 4] = (byte)buf[i];
+		}
 	}
 
+
 	//get chat 
+
 	if (buf[0] == 0xC1 && buf[2] == 0x00)
 	{
 		for (int i = 3; i < buf[1]; i++)
@@ -177,9 +192,11 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 	}
 	
 	//Get Player Index
-	if (buf[0] == 0xC1 && buf[2] == 0xF1 && buf[3] == 0x00){
-		parsePlayerIndex((PMSG_JOINRESULT*)buf);
-	}
+	if (buf[0] == 0xC1)
+		if(buf[2] == 0xF1)
+			if(buf[3] == 0x00){
+				parsePlayerIndex((PMSG_JOINRESULT*)buf);
+			}
 
 	// Get server list
 	LinkManiaHack.GetServerList(buf);
@@ -244,10 +261,16 @@ void parsePlayerIndex(PMSG_JOINRESULT* Data)
 
 void ParseXorKeys(PMSG_XORKEYS * recv)
 {
-	XorKeys = recv->XORKEYES;
+	for (int i = 0; i < sizeof(recv->XORKEYES); i++)
+	{
+		XorKeys[i] = recv->XORKEYES[i];
+	}
+	//XorKeys = recv->XORKEYES;
 }
 
 void ParseChat(PMSG_CHATDATA * recv)
 {
-	AddChatLog(GetActiveWindow(),recv->chatmsg);
+	char buf[128];
+	wsprintf(buf, "[%s] : %s\r\n", recv->chatid, recv->chatmsg);
+	AddChatLog(ChatLogsHANDLE, buf);
 }

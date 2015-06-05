@@ -117,7 +117,7 @@ CSplash::CSplash(int resourceID, COLORREF colTrans) //addon alin1337
 {
 	Init();
 
-	SetBitmap(LoadBitmap(GetModuleHandle("LinkMania Hack.dll"),MAKEINTRESOURCE(resourceID)));
+	SetBitmap(LoadBitmap(GetModuleHandle("LM2Hack.dll"),MAKEINTRESOURCE(resourceID)));
 	SetTransparentColor(colTrans);
 }
 

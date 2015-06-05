@@ -77,6 +77,8 @@ void OnCommand(const HWND hwnd, int id, int notifycode, const HWND hCntrl)
 	//wsprintf(buf, "HIT res %d", id);
 	//MessageBoxA(NULL, buf, "OK", MB_OK);
 
+	//setChatLogs HWND
+	ChatLogsHANDLE = hwnd;
 
 switch (id)
 {
