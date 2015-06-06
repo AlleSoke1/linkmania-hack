@@ -172,7 +172,7 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 				ParseXorKeys((PMSG_XORKEYS*)buf);
 			}*/
 
-	if (buf[0] == (byte)0xc1 && buf[2] == (byte)0xfb && buf[3] == (byte)0x11) {
+	/*if (buf[0] == (byte)0xc1 && buf[2] == (byte)0xfb && buf[3] == (byte)0x11) {
 		for (int i = 4; i < buf[1]; i++) {
 			XorKeys[i - 4] = (byte)buf[i];
 		}
@@ -189,7 +189,7 @@ int WINAPI myrecv(SOCKET s, BYTE *buf, int len, int flags)
 		}
 
 		ParseChat((PMSG_CHATDATA*)buf);
-	}
+	}*/
 	
 	//Get Player Index
 	if (buf[0] == 0xC1)
